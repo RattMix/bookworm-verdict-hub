@@ -34,24 +34,42 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log('Starting daily book ingestion...');
+    console.log('Starting 2025 book ingestion...');
 
-    // Fetch books from Open Library - search for recent fiction and popular books
-    const subjects = ['fiction', 'bestseller', 'award_winner', 'literary_fiction'];
+    // Target genres for 2025 books
+    const targetGenres = [
+      'fantasy',
+      'romance', 
+      'historical_fiction',
+      'thriller',
+      'suspense',
+      'literary_fiction',
+      'memoir',
+      'biography'
+    ];
+
     const allBooks: OpenLibraryBook[] = [];
 
-    for (const subject of subjects) {
+    // Search for books published in 2025 across target genres
+    for (const genre of targetGenres) {
+      console.log(`Searching for ${genre} books from 2025...`);
+      
       const response = await fetch(
-        `https://openlibrary.org/search.json?subject=${subject}&sort=new&limit=25&language=eng&has_fulltext=false`
+        `https://openlibrary.org/search.json?subject=${genre}&publish_year=2025&language=eng&sort=new&limit=20&has_fulltext=false`
       );
       
-      if (!response.ok) continue;
+      if (!response.ok) {
+        console.log(`Failed to fetch ${genre} books`);
+        continue;
+      }
       
       const data = await response.json();
-      allBooks.push(...(data.docs || []));
+      if (data.docs) {
+        allBooks.push(...data.docs);
+      }
     }
 
-    console.log(`Found ${allBooks.length} potential books from Open Library`);
+    console.log(`Found ${allBooks.length} potential 2025 books from Open Library`);
 
     let processedCount = 0;
     const maxBooksPerDay = 100;
@@ -59,8 +77,9 @@ serve(async (req) => {
     for (const book of allBooks) {
       if (processedCount >= maxBooksPerDay) break;
 
-      // Skip books without required fields
+      // Skip books without required fields or not from 2025
       if (!book.title || !book.author_name || !book.isbn) continue;
+      if (!book.first_publish_year || book.first_publish_year !== 2025) continue;
 
       const isbn = book.isbn[0];
       const title = book.title;
@@ -75,28 +94,29 @@ serve(async (req) => {
 
       if (existingBook) continue; // Skip duplicates
 
-      // Extract genres from subjects
-      const genres = book.subject?.slice(0, 3) || ['Fiction'];
+      // Map subjects to our genre categories
+      const genres = mapSubjectsToGenres(book.subject || []);
       
       // Generate cover URL
       const coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
 
-      // Generate a basic critic score (would be replaced with real data)
-      const criticScore = Math.floor(Math.random() * 40) + 60; // 60-100 range
-
-      // Try to find real critic quotes (placeholder for now)
-      const criticQuotes = await findCriticQuotes(title, author);
+      // Placeholder critic quotes
+      const criticQuotes = [{
+        quote: "Critic reviews for this book are coming soon.",
+        source: "Plot Twist",
+        reviewer: "Editorial Team"
+      }];
 
       const bookData = {
         title,
         author,
-        published_date: book.first_publish_year ? `${book.first_publish_year}-01-01` : null,
-        genre: genres,
+        published_date: '2025-01-01',
+        genre: genres.length > 0 ? genres : ['Fiction'],
         page_count: book.number_of_pages_median || null,
         isbn,
         cover_url: coverUrl,
-        summary: `A compelling work by ${author}. Critic reviews for this book are coming soon.`,
-        critic_score: criticScore,
+        summary: generateSummary(title, author, genres),
+        critic_score: null, // No fake scores
         critic_quotes: criticQuotes
       };
 
@@ -106,17 +126,17 @@ serve(async (req) => {
 
       if (!error) {
         processedCount++;
-        console.log(`Added book: ${title} by ${author}`);
+        console.log(`Added 2025 book: ${title} by ${author}`);
       }
     }
 
-    console.log(`Successfully processed ${processedCount} new books`);
+    console.log(`Successfully processed ${processedCount} new 2025 books`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         processed: processedCount,
-        message: `Added ${processedCount} new books to the database`
+        message: `Added ${processedCount} new 2025 books to the database`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -133,10 +153,33 @@ serve(async (req) => {
   }
 });
 
-async function findCriticQuotes(title: string, author: string): Promise<CriticQuote[]> {
-  // Placeholder for real critic quote integration
-  // In a real implementation, this would search BookMarks, Goodreads API, etc.
+function mapSubjectsToGenres(subjects: string[]): string[] {
+  const genreMapping: { [key: string]: string[] } = {
+    'Fantasy': ['fantasy', 'magic', 'dragons', 'wizards'],
+    'Romance': ['romance', 'love', 'relationships'],
+    'Historical Fiction': ['historical', 'history', 'period'],
+    'Thriller': ['thriller', 'suspense', 'mystery', 'crime'],
+    'Literary Fiction': ['literary', 'contemporary', 'literature'],
+    'Memoir': ['memoir', 'autobiography', 'biography', 'personal narrative']
+  };
+
+  const matchedGenres: string[] = [];
   
-  // For now, return empty array - real quotes would be added manually or through APIs
-  return [];
+  for (const [genre, keywords] of Object.entries(genreMapping)) {
+    for (const subject of subjects) {
+      const subjectLower = subject.toLowerCase();
+      if (keywords.some(keyword => subjectLower.includes(keyword))) {
+        if (!matchedGenres.includes(genre)) {
+          matchedGenres.push(genre);
+        }
+      }
+    }
+  }
+
+  return matchedGenres;
+}
+
+function generateSummary(title: string, author: string, genres: string[]): string {
+  const genreText = genres.length > 0 ? genres.join(', ') : 'Fiction';
+  return `A compelling ${genreText.toLowerCase()} work by ${author}. This 2025 release promises to be an engaging addition to contemporary literature. Critic reviews and detailed analysis are coming soon.`;
 }

@@ -1,4 +1,3 @@
-
 import { Star, Users, Award } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -12,6 +11,7 @@ interface Book {
   published_date: string | null;
   page_count: number | null;
   critic_quotes: any[];
+  summary: string | null;
 }
 
 interface BookCardProps {
@@ -31,7 +31,7 @@ const BookCard = ({ book }: BookCardProps) => {
     return new Date(dateString).getFullYear();
   };
 
-  const reviewCount = book.critic_quotes?.length || 0;
+  const reviewCount = Array.isArray(book.critic_quotes) ? book.critic_quotes.length : 0;
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
@@ -65,6 +65,13 @@ const BookCard = ({ book }: BookCardProps) => {
             </p>
           )}
           
+          {/* Summary/Subject */}
+          {book.summary && (
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+              {book.summary}
+            </p>
+          )}
+          
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <div className="bg-blue-100 p-1.5 rounded-full">
@@ -78,7 +85,7 @@ const BookCard = ({ book }: BookCardProps) => {
                   <span className="text-sm text-gray-600">Critic Score</span>
                 </>
               ) : (
-                <span className="text-sm text-gray-500">Score pending</span>
+                <span className="text-sm text-gray-500 italic">Critic reviews coming soon</span>
               )}
             </div>
           </div>

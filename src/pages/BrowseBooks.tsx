@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Filter, SortDesc } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,6 +51,18 @@ const BrowseBooks = () => {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Explore our collection of reviewed titles across all genres
           </p>
+        </div>
+
+        {/* Catalogue Explainer */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-slate-800 mb-3">Why only 2025 books?</h3>
+            <p className="text-slate-700 leading-relaxed">
+              Our goal is to build the most trusted, independent book review aggregator — with millions of titles across all genres. 
+              To keep things fast and focused while we scale, we're currently prioritising books published in <strong>2025</strong> across key genres. 
+              More books (and more years!) are coming soon.
+            </p>
+          </div>
         </div>
 
         {/* Search and Filters */}

@@ -13,7 +13,7 @@ interface Book {
   cover_url: string | null;
   summary: string | null;
   critic_score: number | null;
-  critic_quotes: any[];
+  critic_quotes: any; // Changed from any[] to any to match Supabase Json type
   created_at: string;
 }
 
@@ -61,7 +61,13 @@ export const useBooks = (options: UseBooksOptions = {}) => {
 
         if (error) throw error;
 
-        setBooks(data || []);
+        // Convert the data to match our Book interface
+        const formattedBooks = (data || []).map(book => ({
+          ...book,
+          critic_quotes: Array.isArray(book.critic_quotes) ? book.critic_quotes : []
+        }));
+
+        setBooks(formattedBooks);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch books');
       } finally {

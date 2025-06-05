@@ -109,6 +109,22 @@ const Index = () => {
         [Ad Slot: Leaderboard]
       </div>
 
+      {/* Catalogue Explainer */}
+      <section className="py-12 bg-white border-y border-slate-200">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">Why only 2025 books?</h3>
+              <p className="text-slate-700 leading-relaxed">
+                Our goal is to build the most trusted, independent book review aggregator — with millions of titles across all genres. 
+                To keep things fast and focused while we scale, we're currently prioritising books published in <strong>2025</strong> across key genres. 
+                More books (and more years!) are coming soon.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Featured Books */}
       <section className="py-20">
         <div className="container mx-auto px-6">
