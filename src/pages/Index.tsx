@@ -71,7 +71,7 @@ const featuredBooks = [
   }
 ];
 
-// Real critic reviews from actual publications
+// Real critic reviews from actual publications - no fake user reviews
 const recentReviews = [
   {
     id: "1",
@@ -218,13 +218,13 @@ const Index = () => {
       {/* Call to Action */}
       <section className="py-20 bg-gradient-to-r from-slate-800 via-gray-700 to-slate-600 text-white">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 font-serif">Join the Conversation</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 font-serif">Want to Add Your Voice?</h2>
           <p className="text-xl text-slate-200 mb-10 max-w-2xl mx-auto">
-            Share your perspective on the books that matter to you.
+            Reader reviews are coming soon. You'll be able to rate, review, and explore what others are saying.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-white text-slate-800 hover:bg-slate-100 px-10 py-4 rounded-lg text-lg font-bold shadow-lg">
-              Write a Review
+              Get Notified
             </Button>
             <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-slate-800 px-10 py-4 rounded-lg text-lg font-bold">
               Explore Books
@@ -232,6 +232,47 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white py-12">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="md:col-span-2">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-white p-2 rounded-lg">
+                  <Book className="h-6 w-6 text-slate-900" />
+                </div>
+                <span className="text-2xl font-bold font-serif">Plot Twist</span>
+              </div>
+              <p className="text-slate-300 leading-relaxed">
+                Plot Twist is an independent book review aggregator — combining critic reviews and reader opinions (coming soon). 
+                It's not linked to any platform or publisher.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Explore</h3>
+              <ul className="space-y-2 text-slate-300">
+                <li><a href="/browse" className="hover:text-white transition-colors">Browse Books</a></li>
+                <li><a href="/critics" className="hover:text-white transition-colors">Critics</a></li>
+                <li><a href="/how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Legal</h3>
+              <ul className="space-y-2 text-slate-300">
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Use</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-slate-700 mt-8 pt-8 text-center text-slate-400">
+            <p>&copy; 2024 Plot Twist. Independent book reviews.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
