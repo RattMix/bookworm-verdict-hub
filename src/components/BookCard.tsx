@@ -35,29 +35,31 @@ const BookCard = ({ book }: BookCardProps) => {
     return new Date(dateString).getFullYear();
   };
 
-  // Use calculated_critic_score if available (requires 5+ reviews), otherwise show "coming soon"
+  // Use calculated_critic_score only if book has 5+ reviews
   const hasValidCriticScore = book.calculated_critic_score !== null && (book.critic_review_count || 0) >= 5;
   const displayScore = hasValidCriticScore ? book.calculated_critic_score : null;
   const reviewCount = book.critic_review_count || 0;
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
-  // Enhanced cover image URL generation with multiple fallbacks
+  // Enhanced cover image URL generation with better ISBN handling
   const getCoverImageUrl = () => {
     // First try the stored cover_url
     if (book.cover_url && book.cover_url.trim()) {
       return book.cover_url;
     }
     
-    // Then try ISBN-based sources with clean ISBN
+    // Then try ISBN-based sources with clean ISBN (no scientific notation)
     if (book.isbn && book.isbn.trim()) {
-      const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
-      // Use Open Library as primary source
-      return `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
+      const cleanIsbn = String(book.isbn).replace(/[-\s]/g, '');
+      // Ensure ISBN is not in scientific notation
+      if (cleanIsbn.length >= 10 && !cleanIsbn.includes('e') && !cleanIsbn.includes('E')) {
+        return `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
+      }
     }
     
-    // Fallback to thematic placeholder
-    return "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop&crop=center";
+    // Fallback to book-themed placeholder
+    return "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
   };
 
   const coverImageUrl = getCoverImageUrl();
@@ -67,19 +69,23 @@ const BookCard = ({ book }: BookCardProps) => {
     
     // First fallback: try Google Books if coming from Open Library
     if (target.src.includes('openlibrary') && book.isbn) {
-      const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
-      target.src = `https://books.google.com/books/content?id=${cleanIsbn}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
-      return;
+      const cleanIsbn = String(book.isbn).replace(/[-\s]/g, '');
+      if (cleanIsbn.length >= 10 && !cleanIsbn.includes('e') && !cleanIsbn.includes('E')) {
+        target.src = `https://books.google.com/books/content?id=${cleanIsbn}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
+        return;
+      }
     } 
     
-    // Second fallback: try alternative Open Library format if coming from Google
+    // Second fallback: try alternative Open Library format
     if (target.src.includes('google') && book.isbn) {
-      const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
-      target.src = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-M.jpg`;
-      return;
+      const cleanIsbn = String(book.isbn).replace(/[-\s]/g, '');
+      if (cleanIsbn.length >= 10 && !cleanIsbn.includes('e') && !cleanIsbn.includes('E')) {
+        target.src = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-M.jpg`;
+        return;
+      }
     }
     
-    // Final fallback: thematic book image
+    // Final fallback: reliable book image
     target.src = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
   };
 
@@ -142,10 +148,9 @@ const BookCard = ({ book }: BookCardProps) => {
                 </>
               ) : (
                 <span className="text-sm text-gray-500 italic">
-                  {reviewCount > 0 && reviewCount < 5 ? 
-                    `${reviewCount} review${reviewCount !== 1 ? 's' : ''} • Score available with 5+ reviews` : 
-                    reviewCount >= 5 ? 'Score calculating...' :
-                    'Reviews loading...'
+                  {reviewCount > 0 ? 
+                    `${reviewCount} review${reviewCount !== 1 ? 's' : ''} • ${reviewCount < 5 ? 'Needs 5+ for score' : 'Score calculating...'}` : 
+                    'No reviews yet'
                   }
                 </span>
               )}
@@ -154,7 +159,7 @@ const BookCard = ({ book }: BookCardProps) => {
 
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-500">
-              {book.isbn ? `ISBN: ${book.isbn.slice(0, 13)}${book.isbn.length > 13 ? '...' : ''}` : 'Classic literature'}
+              {book.isbn ? `ISBN: ${String(book.isbn).slice(0, 13)}${String(book.isbn).length > 13 ? '...' : ''}` : 'Classic literature'}
             </span>
             <span className="text-slate-600 font-medium hover:text-slate-800 cursor-pointer">
               Read More →
