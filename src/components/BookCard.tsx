@@ -15,7 +15,7 @@ interface Book {
 }
 
 interface BookCardProps {
-  book: BookCardProps;
+  book: Book;
 }
 
 const BookCard = ({ book }: BookCardProps) => {
