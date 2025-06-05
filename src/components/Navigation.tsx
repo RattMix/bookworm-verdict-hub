@@ -17,10 +17,10 @@ const Navigation = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                BookCritic
+                PlotTwist
               </span>
               <span className="text-xs text-gray-500 font-medium -mt-1">
-                📚 Where books get honest reviews ✨
+                📚 Where stories take unexpected turns ✨
               </span>
             </div>
           </div>

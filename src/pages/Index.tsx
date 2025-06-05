@@ -82,15 +82,15 @@ const Index = () => {
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="text-6xl mb-4 animate-bounce">🍅📚</div>
+            <div className="text-6xl mb-4 animate-bounce">📖🔄</div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 bg-clip-text text-transparent leading-tight">
-              BookCritic
+              PlotTwist
             </h1>
             <p className="text-2xl md:text-3xl text-amber-100 mb-8 leading-relaxed font-medium">
-              Where Every Book Gets Its Moment to Shine! ✨
+              Where Every Story Takes an Unexpected Turn! ✨
             </p>
             <p className="text-lg text-indigo-200 mb-12 max-w-2xl mx-auto">
-              Discover literary gems through honest reviews from critics and fellow book lovers. No algorithms, just authentic recommendations! 🎯
+              Discover literary gems through honest reviews from critics and fellow book lovers. No algorithms, just authentic plot twists! 🎯
             </p>
             
             {/* Search Bar */}
@@ -187,9 +187,9 @@ const Index = () => {
         
         <div className="container mx-auto px-6 text-center relative z-10">
           <div className="text-6xl mb-6">🎉</div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Join Our Book-Loving Community!</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Join Our Plot-Twisting Community!</h2>
           <p className="text-xl text-purple-100 mb-10 max-w-3xl mx-auto">
-            Share your thoughts, discover hidden gems, and help fellow bookworms find their next obsession! 📚✨
+            Share your thoughts, discover hidden gems, and help fellow bookworms find their next plot twist! 📚✨
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white px-10 py-4 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all">
