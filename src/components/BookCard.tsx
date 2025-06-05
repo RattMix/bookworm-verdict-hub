@@ -37,7 +37,7 @@ const BookCard = ({ book }: BookCardProps) => {
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
-  // Build cover image URL from ISBN with better fallback logic
+  // Build cover image URL from ISBN with fallback
   const getCoverImageUrl = () => {
     console.log(`Getting cover for "${book.title}" - ISBN: ${book.isbn}, stored cover_url: ${book.cover_url}`);
     
@@ -60,20 +60,22 @@ const BookCard = ({ book }: BookCardProps) => {
     return "/placeholder.svg";
   };
 
-  // Handle cover image with better fallback logic
+  // Handle cover image error with fallback chain
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.currentTarget;
-    console.log(`Image failed to load: ${target.src} for book "${book.title}"`);
+    const currentSrc = target.src;
+    
+    console.log(`Image failed to load: ${currentSrc} for book "${book.title}"`);
     
     // If Open Library image failed and we have a stored cover_url, try that
-    if (target.src.includes('covers.openlibrary.org') && book.cover_url && book.cover_url.trim()) {
+    if (currentSrc.includes('covers.openlibrary.org') && book.cover_url && book.cover_url.trim()) {
       console.log(`Trying stored cover URL as fallback: ${book.cover_url}`);
       target.src = book.cover_url;
       return;
     }
     
     // Final fallback to placeholder
-    if (target.src !== "/placeholder.svg") {
+    if (!currentSrc.includes('/placeholder.svg')) {
       console.log(`Using final placeholder fallback for "${book.title}"`);
       target.src = "/placeholder.svg";
     }
@@ -138,7 +140,7 @@ const BookCard = ({ book }: BookCardProps) => {
 
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-500">
-              Critic reviews coming soon
+              {book.isbn ? 'Cover available' : 'Cover coming soon'}
             </span>
             <span className="text-slate-600 font-medium hover:text-slate-800 cursor-pointer">
               Read More →

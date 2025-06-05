@@ -54,14 +54,17 @@ const BookDetail = () => {
   const getCoverImageUrl = () => {
     if (bookData.isbn && bookData.isbn.trim()) {
       const cleanIsbn = bookData.isbn.replace(/[-\s]/g, '');
-      return `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
+      const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
+      console.log(`Book detail cover URL: ${openLibraryUrl}`);
+      return openLibraryUrl;
     }
     return bookData.coverUrl || "/placeholder.svg";
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.currentTarget;
-    if (target.src !== "/placeholder.svg") {
+    console.log(`Book detail image failed: ${target.src}`);
+    if (!target.src.includes('/placeholder.svg')) {
       target.src = "/placeholder.svg";
     }
   };

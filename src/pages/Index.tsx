@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Search, Star, TrendingUp, Book, Users, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -55,12 +56,12 @@ const Index = () => {
   const { books: featuredBooks, loading, error, totalCount } = useBooks({ limit: 6, sortBy: 'trending' });
   const { toast } = useToast();
 
-  // Auto-trigger ingestion if no books found
+  // Auto-trigger ingestion to refresh with ISBN data
   useEffect(() => {
     const autoIngest = async () => {
-      // Only trigger if not loading, no error, and no books found
-      if (!loading && !error && totalCount === 0 && !isIngesting) {
-        console.log('No books found, triggering auto-ingestion...');
+      // Always trigger ingestion to get books with ISBNs
+      if (!loading && !error && !isIngesting) {
+        console.log('Triggering ingestion to get books with ISBNs...');
         setIsIngesting(true);
         
         try {
@@ -84,7 +85,7 @@ const Index = () => {
     };
 
     autoIngest();
-  }, [loading, error, totalCount, isIngesting]);
+  }, [loading, error, isIngesting]);
 
   console.log('Featured books data:', featuredBooks);
   console.log('Loading state:', loading);
@@ -189,7 +190,7 @@ const Index = () => {
           {(loading || isIngesting) ? (
             <div className="text-center py-8">
               <p className="text-gray-600">
-                {isIngesting ? "Adding new books to our collection..." : "Loading latest books..."}
+                {isIngesting ? "Adding books with cover images..." : "Loading latest books..."}
               </p>
             </div>
           ) : featuredBooks.length > 0 ? (
@@ -200,8 +201,8 @@ const Index = () => {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600">Our collection is growing! New books are being added regularly.</p>
-              <p className="text-gray-500 text-sm mt-2">Check back soon for the latest releases and reviews.</p>
+              <p className="text-gray-600">Loading books with cover images...</p>
+              <p className="text-gray-500 text-sm mt-2">This may take a moment while we set up the collection.</p>
             </div>
           )}
         </div>
