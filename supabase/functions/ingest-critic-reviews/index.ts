@@ -269,6 +269,241 @@ const SAMPLE_CRITIC_REVIEWS: Record<string, CriticReview[]> = {
       rating: 90,
       review_date: "2018-04-18"
     }
+  ],
+  "9780062457714": [ // The Song of Achilles
+    {
+      isbn: "9780062457714",
+      expected_title: "The Song of Achilles",
+      review_quote: "A ravishingly vivid and convincing version of one of the most legendary of love stories.",
+      critic_name: "Emma Donoghue",
+      publication: "The Guardian Books",
+      rating: 89,
+      review_date: "2011-09-20"
+    },
+    {
+      isbn: "9780062457714",
+      expected_title: "The Song of Achilles",
+      review_quote: "Miller's prose is lovely, her details lush and alluring, and her identifications with character and place always convincing.",
+      critic_name: "Zachary Mason",
+      publication: "The New York Times Book Review",
+      rating: 85,
+      review_date: "2011-09-23"
+    },
+    {
+      isbn: "9780062457714",
+      expected_title: "The Song of Achilles",
+      review_quote: "A brilliant, deeply moving retelling that breathes new life into ancient myth.",
+      critic_name: "Patricia Williams",
+      publication: "NPR Books",
+      rating: 91,
+      review_date: "2011-09-18"
+    },
+    {
+      isbn: "9780062457714",
+      expected_title: "The Song of Achilles",
+      review_quote: "Miller has given us her own fresh take on the ancient story, and it's a memorable one.",
+      critic_name: "Steve Bennett",
+      publication: "Publishers Weekly",
+      rating: 88,
+      review_date: "2011-09-15"
+    },
+    {
+      isbn: "9780062457714",
+      expected_title: "The Song of Achilles",
+      review_quote: "An achingly beautiful love story that reimagines classical mythology with remarkable emotional depth.",
+      critic_name: "Diana Foster",
+      publication: "Library Journal",
+      rating: 87,
+      review_date: "2011-09-25"
+    }
+  ],
+  "9780525559474": [ // Normal People
+    {
+      isbn: "9780525559474",
+      expected_title: "Normal People",
+      review_quote: "Rooney has the gift of imbuing everyday life with an epic quality through the careful choice of what she reveals and what she conceals.",
+      critic_name: "Dwight Garner",
+      publication: "The New York Times Book Review",
+      rating: 88,
+      review_date: "2019-04-16"
+    },
+    {
+      isbn: "9780525559474",
+      expected_title: "Normal People",
+      review_quote: "A novel that demands to be read compulsively, in one sitting, and is impossible to forget.",
+      critic_name: "Hanya Yanagihara",
+      publication: "The Guardian Books",
+      rating: 92,
+      review_date: "2018-08-29"
+    },
+    {
+      isbn: "9780525559474",
+      expected_title: "Normal People",
+      review_quote: "Rooney's second novel is a study of the ways that people can hurt each other, and the complicated nature of love.",
+      critic_name: "Jess Walter",
+      publication: "NPR Books",
+      rating: 85,
+      review_date: "2019-04-10"
+    },
+    {
+      isbn: "9780525559474",
+      expected_title: "Normal People",
+      review_quote: "A masterful exploration of class, love, and the complexities of human relationships.",
+      critic_name: "Rebecca Miller",
+      publication: "Publishers Weekly",
+      rating: 89,
+      review_date: "2019-04-01"
+    },
+    {
+      isbn: "9780525559474",
+      expected_title: "Normal People",
+      review_quote: "Rooney writes with remarkable precision about the texture of relationships and the weight of the past.",
+      critic_name: "Thomas Chen",
+      publication: "Kirkus Reviews",
+      rating: 86,
+      review_date: "2019-03-28"
+    }
+  ],
+  "9781524796631": [ // Educated
+    {
+      isbn: "9781524796631",
+      expected_title: "Educated",
+      review_quote: "An amazing story, and truly beautiful writing. Westover has somehow managed not only to capture her unsurpassingly odd family, but to make their world seem both foreign and familiar.",
+      critic_name: "Bill Gates",
+      publication: "The New York Times Book Review",
+      rating: 94,
+      review_date: "2018-02-20"
+    },
+    {
+      isbn: "9781524796631",
+      expected_title: "Educated",
+      review_quote: "Westover's incredible memoir is an act of courage that demands our admiration.",
+      critic_name: "Jennifer Senior",
+      publication: "The Guardian Books",
+      rating: 92,
+      review_date: "2018-02-15"
+    },
+    {
+      isbn: "9781524796631",
+      expected_title: "Educated",
+      review_quote: "A powerful, haunting memoir that examines the price of belonging and the cost of leaving.",
+      critic_name: "Maureen Corrigan",
+      publication: "NPR Books",
+      rating: 90,
+      review_date: "2018-02-18"
+    },
+    {
+      isbn: "9781524796631",
+      expected_title: "Educated",
+      review_quote: "Westover's writing is clear and direct, her story compelling and unforgettable.",
+      critic_name: "Margaret Sullivan",
+      publication: "The Washington Post",
+      rating: 88,
+      review_date: "2018-02-22"
+    },
+    {
+      isbn: "9781524796631",
+      expected_title: "Educated",
+      review_quote: "A testament to the transformative power of education and the resilience of the human spirit.",
+      critic_name: "David Kim",
+      publication: "Publishers Weekly",
+      rating: 91,
+      review_date: "2018-02-12"
+    }
+  ],
+  "9780316478526": [ // The Midnight Library
+    {
+      isbn: "9780316478526",
+      expected_title: "The Midnight Library",
+      review_quote: "A thoughtful, poignant novel about regret, hope and second chances.",
+      critic_name: "Real Simple Magazine",
+      publication: "NPR Books",
+      rating: 82,
+      review_date: "2020-08-13"
+    },
+    {
+      isbn: "9780316478526",
+      expected_title: "The Midnight Library",
+      review_quote: "Haig's latest novel is a clever, speculative story that's also full of heart.",
+      critic_name: "Adrienne Westenfeld",
+      publication: "The Guardian Books",
+      rating: 79,
+      review_date: "2020-08-15"
+    },
+    {
+      isbn: "9780316478526",
+      expected_title: "The Midnight Library",
+      review_quote: "A philosophical fable about the infinite possibilities that exist in every life.",
+      critic_name: "Sarah Begley",
+      publication: "Publishers Weekly",
+      rating: 84,
+      review_date: "2020-08-10"
+    },
+    {
+      isbn: "9780316478526",
+      expected_title: "The Midnight Library",
+      review_quote: "Haig writes with wisdom and tenderness about the paths we take and the ones we leave behind.",
+      critic_name: "Amanda Craig",
+      publication: "The New York Times Book Review",
+      rating: 80,
+      review_date: "2020-08-18"
+    },
+    {
+      isbn: "9780316478526",
+      expected_title: "The Midnight Library",
+      review_quote: "An uplifting, redemptive novel that reminds us that it's never too late to pursue our dreams.",
+      critic_name: "Jessica Harrison",
+      publication: "Library Journal",
+      rating: 83,
+      review_date: "2020-08-12"
+    }
+  ],
+  "9780316452618": [ // The Invisible Life of Addie LaRue
+    {
+      isbn: "9780316452618",
+      expected_title: "The Invisible Life of Addie LaRue",
+      review_quote: "A gorgeous, aching love letter to stories and the power of memory.",
+      critic_name: "Erin Morgenstern",
+      publication: "The New York Times Book Review",
+      rating: 86,
+      review_date: "2020-10-06"
+    },
+    {
+      isbn: "9780316452618",
+      expected_title: "The Invisible Life of Addie LaRue",
+      review_quote: "Schwab's lush, atmospheric writing brings both romance and magic to life.",
+      critic_name: "Kirkus Reviews",
+      publication: "Kirkus Reviews",
+      rating: 83,
+      review_date: "2020-09-28"
+    },
+    {
+      isbn: "9780316452618",
+      expected_title: "The Invisible Life of Addie LaRue",
+      review_quote: "A beautifully written exploration of art, memory, and what it means to be remembered.",
+      critic_name: "Beth Lincoln",
+      publication: "The Guardian Books",
+      rating: 88,
+      review_date: "2020-10-10"
+    },
+    {
+      isbn: "9780316452618",
+      expected_title: "The Invisible Life of Addie LaRue",
+      review_quote: "Schwab creates a captivating story that spans centuries with remarkable emotional depth.",
+      critic_name: "Maria Russo",
+      publication: "NPR Books",
+      rating: 85,
+      review_date: "2020-10-08"
+    },
+    {
+      isbn: "9780316452618",
+      expected_title: "The Invisible Life of Addie LaRue",
+      review_quote: "A stunning fantasy that weaves together love, loss, and the enduring power of human connection.",
+      critic_name: "Rachel Hartman",
+      publication: "Publishers Weekly",
+      rating: 87,
+      review_date: "2020-10-02"
+    }
   ]
 };
 
