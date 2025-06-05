@@ -22,7 +22,11 @@ export const useCriticReviews = (bookId: string) => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchReviews = useCallback(async () => {
-    if (!bookId) return;
+    if (!bookId) {
+      setReviews([]);
+      setLoading(false);
+      return;
+    }
     
     try {
       setLoading(true);
@@ -34,7 +38,7 @@ export const useCriticReviews = (bookId: string) => {
         .from('critic_reviews')
         .select('*')
         .eq('book_id', bookId)
-        .order('rating', { ascending: false });
+        .order('review_date', { ascending: false });
 
       if (error) {
         console.error('Error fetching critic reviews:', error);
@@ -42,6 +46,7 @@ export const useCriticReviews = (bookId: string) => {
       }
 
       console.log('Critic reviews fetched:', data);
+      console.log('Reviews filtered for book ID:', bookId);
       setReviews(data || []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch critic reviews';

@@ -1,3 +1,4 @@
+
 import { Star, Award, Users, BookOpen, Calendar, Share2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -67,6 +68,9 @@ const BookDetail = () => {
 
   const hasValidCriticScore = book?.calculated_critic_score !== null && (book?.critic_review_count || 0) >= 5;
   const displayScore = hasValidCriticScore ? book?.calculated_critic_score : null;
+
+  // Additional filtering to ensure only reviews for this book are shown
+  const filteredReviews = reviews.filter(r => r.book_id === book?.id);
 
   if (booksLoading) {
     return (
@@ -238,6 +242,7 @@ const BookDetail = () => {
               <div className="mb-4 p-3 bg-gray-100 rounded text-sm">
                 <p>Debug: Reviews loading: {reviewsLoading.toString()}</p>
                 <p>Debug: Reviews count: {reviews.length}</p>
+                <p>Debug: Filtered reviews count: {filteredReviews.length}</p>
                 <p>Debug: Book ISBN: {book?.isbn}</p>
                 <p>Debug: Book ID: {book?.id}</p>
               </div>
@@ -246,9 +251,9 @@ const BookDetail = () => {
                 <div className="text-center py-8">
                   <p className="text-gray-600">Loading critic reviews...</p>
                 </div>
-              ) : reviews.length > 0 ? (
+              ) : filteredReviews.length > 0 ? (
                 <div className="space-y-6">
-                  {reviews.map((review) => (
+                  {filteredReviews.map((review) => (
                     <div key={review.id} className="border-l-4 border-blue-500 pl-6">
                       <p className="text-gray-700 text-lg mb-3 leading-relaxed">"{review.review_quote}"</p>
                       <div className="flex items-center gap-4">
