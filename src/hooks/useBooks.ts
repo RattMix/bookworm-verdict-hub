@@ -53,7 +53,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         // Apply sorting
         switch (sortBy) {
           case 'critic_score':
-            query = query.order('calculated_critic_score', { ascending: false, nullsLast: true });
+            query = query.order('calculated_critic_score', { ascending: false, nullsFirst: false });
             break;
           case 'trending':
             // For trending, prioritize books with valid critic scores (5+ reviews)
