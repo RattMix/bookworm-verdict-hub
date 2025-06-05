@@ -12,22 +12,31 @@ const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { books, loading: booksLoading } = useBooks({ limit: 1000 });
   const book = books.find(b => b.id === id);
-  const { reviews, loading: reviewsLoading } = useCriticReviews(id || '');
+  const { reviews, loading: reviewsLoading, refetchCriticReviews } = useCriticReviews(id || '');
 
-  // Add a function to trigger the ingestion
+  // Improved function to trigger the ingestion with better error handling
   const handleIngestReviews = async () => {
     try {
-      console.log('Starting critic review ingestion...');
+      console.log('🚀 Starting critic review ingestion...');
       const { data, error } = await supabase.functions.invoke('ingest-critic-reviews');
+
       if (error) {
-        console.error('Error ingesting reviews:', error);
+        console.error('❌ Ingestion error:', error.message || error);
+        alert('Error ingesting critic reviews. Please try again.');
+        return;
+      }
+
+      console.log('✅ Ingestion result:', data);
+
+      // Use refetch instead of page reload
+      if (refetchCriticReviews) {
+        await refetchCriticReviews();
       } else {
-        console.log('Ingestion result:', data);
-        // Refresh the page to see the new reviews
-        window.location.reload();
+        window.location.reload(); // fallback
       }
     } catch (err) {
-      console.error('Failed to ingest reviews:', err);
+      console.error('❌ Failed to call ingestion function:', err);
+      alert('Unexpected error during review ingestion.');
     }
   };
 
@@ -229,8 +238,8 @@ const BookDetail = () => {
               <div className="mb-4 p-3 bg-gray-100 rounded text-sm">
                 <p>Debug: Reviews loading: {reviewsLoading.toString()}</p>
                 <p>Debug: Reviews count: {reviews.length}</p>
-                <p>Debug: Book ISBN: {book.isbn}</p>
-                <p>Debug: Book ID: {book.id}</p>
+                <p>Debug: Book ISBN: {book?.isbn}</p>
+                <p>Debug: Book ID: {book?.id}</p>
               </div>
 
               {reviewsLoading ? (
