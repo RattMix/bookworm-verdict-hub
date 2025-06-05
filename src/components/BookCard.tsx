@@ -18,59 +18,74 @@ interface BookCardProps {
 
 const BookCard = ({ book }: BookCardProps) => {
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "text-green-600 bg-green-50 border-green-200";
-    if (score >= 6) return "text-yellow-600 bg-yellow-50 border-yellow-200";
-    return "text-red-600 bg-red-50 border-red-200";
+    if (score >= 8) return "text-emerald-700 bg-emerald-100 border-emerald-300";
+    if (score >= 6) return "text-amber-700 bg-amber-100 border-amber-300";
+    return "text-rose-700 bg-rose-100 border-rose-300";
+  };
+
+  const getScoreEmoji = (score: number) => {
+    if (score >= 8) return "🔥";
+    if (score >= 6) return "👍";
+    return "📖";
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
+    <div className="bg-white rounded-2xl shadow-lg border-2 border-purple-100 overflow-hidden hover:shadow-2xl hover:border-purple-300 transition-all duration-300 group cursor-pointer transform hover:-translate-y-2">
       <div className="relative">
         <img 
           src={book.coverUrl} 
           alt={book.title}
-          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3">
-          <span className="bg-slate-800 text-white px-2 py-1 rounded-full text-xs font-medium">
-            {book.genre}
+          <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+            {book.genre} ✨
+          </span>
+        </div>
+        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
+          <span className="text-sm font-bold text-purple-600">
+            {book.reviewCount.toLocaleString()} reviews 💬
           </span>
         </div>
       </div>
       
-      <div className="p-5">
-        <h3 className="font-bold text-lg text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">
+      <div className="p-6">
+        <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-purple-600 transition-colors leading-tight">
           {book.title}
         </h3>
-        <p className="text-slate-600 mb-4">by {book.author}</p>
+        <p className="text-gray-600 mb-4 font-medium">by {book.author}</p>
         
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {/* Critic Score */}
-            <div className="flex items-center space-x-1">
-              <Award className="h-4 w-4 text-slate-500" />
-              <span className={`px-2 py-1 rounded-md text-sm font-medium border ${getScoreColor(book.criticScore)}`}>
-                {book.criticScore}
+            <div className="flex items-center space-x-2">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-2 rounded-full">
+                <Award className="h-4 w-4 text-white" />
+              </div>
+              <span className={`px-3 py-1 rounded-full text-sm font-bold border-2 ${getScoreColor(book.criticScore)} flex items-center gap-1`}>
+                {getScoreEmoji(book.criticScore)} {book.criticScore}
               </span>
             </div>
             
             {/* User Score */}
-            <div className="flex items-center space-x-1">
-              <Users className="h-4 w-4 text-slate-500" />
-              <span className={`px-2 py-1 rounded-md text-sm font-medium border ${getScoreColor(book.userScore)}`}>
-                {book.userScore}
+            <div className="flex items-center space-x-2">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-2 rounded-full">
+                <Users className="h-4 w-4 text-white" />
+              </div>
+              <span className={`px-3 py-1 rounded-full text-sm font-bold border-2 ${getScoreColor(book.userScore)} flex items-center gap-1`}>
+                {getScoreEmoji(book.userScore)} {book.userScore}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-sm text-slate-500">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1">
             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span>{book.reviewCount.toLocaleString()} reviews</span>
+            <span className="text-sm text-gray-600 font-medium">Highly rated!</span>
           </div>
-          <span className="text-blue-600 font-medium hover:text-blue-700">
-            View Details →
+          <span className="text-purple-600 font-bold hover:text-purple-700 cursor-pointer flex items-center gap-1">
+            Read More 📚 →
           </span>
         </div>
       </div>
