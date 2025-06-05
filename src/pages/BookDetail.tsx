@@ -1,3 +1,4 @@
+
 import { Star, Award, Users, BookOpen, Calendar, Share2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,22 @@ const BookDetail = () => {
     return "bg-rose-100 text-rose-800 border-rose-300";
   };
 
+  // Improved cover image handling for book detail page
+  const getCoverImageUrl = () => {
+    if (bookData.isbn && bookData.isbn.trim()) {
+      const cleanIsbn = bookData.isbn.replace(/[-\s]/g, '');
+      return `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
+    }
+    return bookData.coverUrl || "/placeholder.svg";
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    if (target.src !== "/placeholder.svg") {
+      target.src = "/placeholder.svg";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
       <Navigation />
@@ -59,12 +76,11 @@ const BookDetail = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-md p-6 sticky top-24 border border-slate-200">
               <img 
-                src={bookData.coverUrl} 
+                src={getCoverImageUrl()} 
                 alt={bookData.title}
                 className="w-full h-96 object-cover rounded-lg mb-6"
-                onError={(e) => {
-                  e.currentTarget.src = "/placeholder.svg";
-                }}
+                onError={handleImageError}
+                onLoad={() => console.log(`Book detail cover loaded: ${getCoverImageUrl()}`)}
               />
               
               <div className="space-y-4">

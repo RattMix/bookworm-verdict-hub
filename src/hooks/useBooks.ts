@@ -41,7 +41,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         
         let query = supabase
           .from('books')
-          .select('*', { count: 'exact' });
+          .select('id, title, author, published_date, genre, page_count, isbn, cover_url, summary, critic_score, critic_quotes, created_at', { count: 'exact' });
 
         // Filter by genre if specified
         if (genre && genre !== 'all') {
@@ -73,6 +73,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         console.log('Raw data from Supabase:', data);
         console.log('Number of books fetched:', data?.length || 0);
         console.log('Total count from database:', count);
+        console.log('Sample book data (first book):', data?.[0]);
 
         setTotalCount(count || 0);
 
@@ -83,6 +84,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         }));
 
         console.log('Formatted books:', formattedBooks);
+        console.log('Sample formatted book ISBN:', formattedBooks[0]?.isbn);
         setBooks(formattedBooks);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch books';

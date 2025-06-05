@@ -37,18 +37,44 @@ const BookCard = ({ book }: BookCardProps) => {
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
-  // Build cover image URL from ISBN
+  // Build cover image URL from ISBN with better fallback logic
   const getCoverImageUrl = () => {
-    if (book.isbn) {
-      return `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`;
+    console.log(`Getting cover for "${book.title}" - ISBN: ${book.isbn}, stored cover_url: ${book.cover_url}`);
+    
+    // First try: Use ISBN to build Open Library URL
+    if (book.isbn && book.isbn.trim()) {
+      const cleanIsbn = book.isbn.replace(/[-\s]/g, ''); // Clean ISBN
+      const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
+      console.log(`Built Open Library URL: ${openLibraryUrl}`);
+      return openLibraryUrl;
     }
+    
+    // Second try: Use stored cover_url if available
+    if (book.cover_url && book.cover_url.trim()) {
+      console.log(`Using stored cover URL: ${book.cover_url}`);
+      return book.cover_url;
+    }
+    
+    // Fallback: Use placeholder
+    console.log(`No cover available for "${book.title}", using placeholder`);
     return "/placeholder.svg";
   };
 
-  // Handle cover image with better fallback
+  // Handle cover image with better fallback logic
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.currentTarget;
+    console.log(`Image failed to load: ${target.src} for book "${book.title}"`);
+    
+    // If Open Library image failed and we have a stored cover_url, try that
+    if (target.src.includes('covers.openlibrary.org') && book.cover_url && book.cover_url.trim()) {
+      console.log(`Trying stored cover URL as fallback: ${book.cover_url}`);
+      target.src = book.cover_url;
+      return;
+    }
+    
+    // Final fallback to placeholder
     if (target.src !== "/placeholder.svg") {
+      console.log(`Using final placeholder fallback for "${book.title}"`);
       target.src = "/placeholder.svg";
     }
   };
@@ -64,6 +90,7 @@ const BookCard = ({ book }: BookCardProps) => {
             alt={`Cover of ${book.title}`}
             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
             onError={handleImageError}
+            onLoad={() => console.log(`Successfully loaded cover for "${book.title}": ${coverImageUrl}`)}
             loading="lazy"
           />
           <div className="absolute top-3 right-3">
