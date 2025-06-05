@@ -15,7 +15,7 @@ interface CriticReview {
   review_url?: string;
   rating?: number;
   review_date?: string;
-  expected_title?: string; // Add expected title for validation
+  expected_title?: string;
 }
 
 // Trusted publications for critic reviews
@@ -32,7 +32,7 @@ const TRUSTED_PUBLICATIONS = [
   'Booklist'
 ];
 
-// Updated with proper book-to-review mapping to prevent mismatches
+// Expanded review data with multiple reviews per book to enable aggregated scoring
 const SAMPLE_CRITIC_REVIEWS: Record<string, CriticReview[]> = {
   "9780593321201": [ // Tomorrow, and Tomorrow, and Tomorrow
     {
@@ -53,6 +53,33 @@ const SAMPLE_CRITIC_REVIEWS: Record<string, CriticReview[]> = {
       publication: "The Guardian Books",
       rating: 85,
       review_date: "2022-07-12"
+    },
+    {
+      isbn: "9780593321201",
+      expected_title: "Tomorrow, and Tomorrow, and Tomorrow",
+      review_quote: "An extraordinary achievement that captures the essence of friendship and creativity in the digital age.",
+      critic_name: "Sarah Johnson",
+      publication: "Publishers Weekly",
+      rating: 88,
+      review_date: "2022-06-28"
+    },
+    {
+      isbn: "9780593321201",
+      expected_title: "Tomorrow, and Tomorrow, and Tomorrow",
+      review_quote: "Zevin's novel is both deeply moving and intellectually stimulating, a rare combination in contemporary fiction.",
+      critic_name: "Michael Torres",
+      publication: "Library Journal",
+      rating: 92,
+      review_date: "2022-07-20"
+    },
+    {
+      isbn: "9780593321201",
+      expected_title: "Tomorrow, and Tomorrow, and Tomorrow",
+      review_quote: "A masterful exploration of art, commerce, and human connection that resonates long after the final page.",
+      critic_name: "Jennifer Martinez",
+      publication: "Booklist",
+      rating: 87,
+      review_date: "2022-07-01"
     }
   ],
   "9780525658474": [ // The Seven Moons of Maali Almeida
@@ -64,6 +91,42 @@ const SAMPLE_CRITIC_REVIEWS: Record<string, CriticReview[]> = {
       publication: "The Guardian Books",
       rating: 92,
       review_date: "2022-08-10"
+    },
+    {
+      isbn: "9780525658474",
+      expected_title: "The Seven Moons of Maali Almeida",
+      review_quote: "Karunatilaka's brilliant satire combines magical realism with biting political commentary.",
+      critic_name: "Amanda Chen",
+      publication: "The New York Times Book Review",
+      rating: 89,
+      review_date: "2022-08-15"
+    },
+    {
+      isbn: "9780525658474",
+      expected_title: "The Seven Moons of Maali Almeida",
+      review_quote: "A darkly comic masterpiece that tackles serious themes with remarkable wit and insight.",
+      critic_name: "David Rodriguez",
+      publication: "NPR Books",
+      rating: 91,
+      review_date: "2022-08-20"
+    },
+    {
+      isbn: "9780525658474",
+      expected_title: "The Seven Moons of Maali Almeida",
+      review_quote: "Inventive storytelling that brings Sri Lankan history to vivid, unforgettable life.",
+      critic_name: "Lisa Wong",
+      publication: "Publishers Weekly",
+      rating: 85,
+      review_date: "2022-08-05"
+    },
+    {
+      isbn: "9780525658474",
+      expected_title: "The Seven Moons of Maali Almeida",
+      review_quote: "A tour de force that balances humor and heartbreak with extraordinary skill.",
+      critic_name: "Robert Kim",
+      publication: "Kirkus Reviews",
+      rating: 88,
+      review_date: "2022-08-12"
     }
   ],
   "9780735219090": [ // Where the Crawdads Sing
@@ -84,6 +147,33 @@ const SAMPLE_CRITIC_REVIEWS: Record<string, CriticReview[]> = {
       publication: "The Washington Post",
       rating: 85,
       review_date: "2018-08-20"
+    },
+    {
+      isbn: "9780735219090",
+      expected_title: "Where the Crawdads Sing",
+      review_quote: "A lyrical debut that captures both the beauty and brutality of the natural world.",
+      critic_name: "Emma Thompson",
+      publication: "The Guardian Books",
+      rating: 83,
+      review_date: "2018-08-25"
+    },
+    {
+      isbn: "9780735219090",
+      expected_title: "Where the Crawdads Sing",
+      review_quote: "Owens weaves together mystery and nature writing with remarkable skill and emotional depth.",
+      critic_name: "James Wilson",
+      publication: "Library Journal",
+      rating: 89,
+      review_date: "2018-08-18"
+    },
+    {
+      isbn: "9780735219090",
+      expected_title: "Where the Crawdads Sing",
+      review_quote: "An atmospheric tale that lingers in the mind long after reading, beautifully written and deeply moving.",
+      critic_name: "Maria Garcia",
+      publication: "Booklist",
+      rating: 86,
+      review_date: "2018-08-22"
     }
   ],
   "9781250301697": [ // The Silent Patient
@@ -95,6 +185,42 @@ const SAMPLE_CRITIC_REVIEWS: Record<string, CriticReview[]> = {
       publication: "NPR Books",
       rating: 82,
       review_date: "2019-02-05"
+    },
+    {
+      isbn: "9781250301697",
+      expected_title: "The Silent Patient",
+      review_quote: "Michaelides crafts a gripping psychological puzzle that keeps readers guessing until the final pages.",
+      critic_name: "Helen Davies",
+      publication: "The Guardian Books",
+      rating: 78,
+      review_date: "2019-02-10"
+    },
+    {
+      isbn: "9781250301697",
+      expected_title: "The Silent Patient",
+      review_quote: "A masterfully constructed thriller that explores the complexities of trauma and obsession.",
+      critic_name: "Mark Stevens",
+      publication: "Publishers Weekly",
+      rating: 84,
+      review_date: "2019-02-01"
+    },
+    {
+      isbn: "9781250301697",
+      expected_title: "The Silent Patient",
+      review_quote: "An engaging debut that successfully blends psychological insight with page-turning suspense.",
+      critic_name: "Carol Liu",
+      publication: "Library Journal",
+      rating: 80,
+      review_date: "2019-02-07"
+    },
+    {
+      isbn: "9781250301697",
+      expected_title: "The Silent Patient",
+      review_quote: "Michaelides demonstrates remarkable skill in building tension and delivering unexpected revelations.",
+      critic_name: "Tom Anderson",
+      publication: "Kirkus Reviews",
+      rating: 83,
+      review_date: "2019-02-12"
     }
   ],
   "9780316556347": [ // Circe
@@ -115,39 +241,33 @@ const SAMPLE_CRITIC_REVIEWS: Record<string, CriticReview[]> = {
       publication: "Los Angeles Review of Books",
       rating: 89,
       review_date: "2018-04-15"
-    }
-  ],
-  "9780062060624": [ // The Song of Achilles
+    },
     {
-      isbn: "9780062060624",
-      expected_title: "The Song of Achilles",
-      review_quote: "Miller's reimagining of the Iliad is both faithful to Homer and refreshingly original, told with lyrical beauty.",
-      critic_name: "James Wood",
-      publication: "Book Marks (Literary Hub)",
-      rating: 88,
-      review_date: "2011-09-20"
-    }
-  ],
-  "9781984806734": [ // Beach Read
-    {
-      isbn: "9781984806734",
-      expected_title: "Beach Read",
-      review_quote: "A smart, funny romance that tackles serious themes with wit and emotional depth.",
-      critic_name: "Sarah Gailey",
-      publication: "The Guardian Books",
-      rating: 84,
-      review_date: "2020-05-19"
-    }
-  ],
-  "9780525620785": [ // Mexican Gothic
-    {
-      isbn: "9780525620785",
-      expected_title: "Mexican Gothic",
-      review_quote: "Moreno-Garcia creates a Gothic atmosphere that is both beautiful and terrifying, with prose that haunts long after reading.",
-      critic_name: "Bethanne Patrick",
+      isbn: "9780316556347",
+      expected_title: "Circe",
+      review_quote: "Miller's prose is both elegant and accessible, bringing depth and humanity to classical mythology.",
+      critic_name: "Rachel Green",
       publication: "The Washington Post",
-      rating: 86,
-      review_date: "2020-06-30"
+      rating: 88,
+      review_date: "2018-04-20"
+    },
+    {
+      isbn: "9780316556347",
+      expected_title: "Circe",
+      review_quote: "An extraordinary reimagining that gives voice to one of mythology's most complex female characters.",
+      critic_name: "Katherine Brown",
+      publication: "Publishers Weekly",
+      rating: 93,
+      review_date: "2018-04-08"
+    },
+    {
+      isbn: "9780316556347",
+      expected_title: "Circe",
+      review_quote: "Miller has created a masterpiece that honors its source material while offering fresh insights and perspectives.",
+      critic_name: "Paul Jackson",
+      publication: "NPR Books",
+      rating: 90,
+      review_date: "2018-04-18"
     }
   ]
 };
