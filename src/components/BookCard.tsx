@@ -42,19 +42,16 @@ const BookCard = ({ book }: BookCardProps) => {
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
-  // Build cover image URL from ISBN
+  // Enhanced cover image URL generation with multiple fallbacks
   const getCoverImageUrl = () => {
-    console.log(`Getting cover for "${book.title}" - ISBN: ${book.isbn}`);
-    
     if (book.isbn && book.isbn.trim()) {
       const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
-      const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
-      console.log(`Built Open Library URL: ${openLibraryUrl}`);
-      return openLibraryUrl;
+      // Try Open Library first (most reliable)
+      return `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
     }
     
-    console.log(`No ISBN available for "${book.title}", using placeholder`);
-    return "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
+    // Fallback to a more appropriate placeholder
+    return "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop&crop=center";
   };
 
   const coverImageUrl = getCoverImageUrl();
@@ -67,11 +64,21 @@ const BookCard = ({ book }: BookCardProps) => {
             src={coverImageUrl}
             alt={`Cover of ${book.title}`}
             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-            onLoad={() => console.log(`Successfully loaded cover for "${book.title}": ${coverImageUrl}`)}
             onError={(e) => {
-              console.log(`Cover failed to load for "${book.title}", using fallback`);
               const target = e.currentTarget;
-              target.src = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
+              // First fallback: try Google Books
+              if (target.src.includes('openlibrary')) {
+                const cleanIsbn = book.isbn?.replace(/[-\s]/g, '');
+                target.src = `https://books.google.com/books/content?id=&printsec=frontcover&img=1&zoom=1&imgtk=${cleanIsbn}`;
+              } 
+              // Second fallback: generic book placeholder
+              else if (target.src.includes('google')) {
+                target.src = "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop&crop=center";
+              }
+              // Final fallback: simple book image
+              else {
+                target.src = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
+              }
             }}
             loading="lazy"
           />
@@ -80,6 +87,13 @@ const BookCard = ({ book }: BookCardProps) => {
               {primaryGenre}
             </span>
           </div>
+          {year === 2025 && (
+            <div className="absolute top-3 left-3">
+              <span className="bg-green-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-md">
+                2025
+              </span>
+            </div>
+          )}
         </div>
         
         <div className="p-6">
@@ -116,7 +130,7 @@ const BookCard = ({ book }: BookCardProps) => {
                 </>
               ) : (
                 <span className="text-sm text-gray-500 italic">
-                  {reviewCount > 0 ? `${reviewCount} critic review${reviewCount !== 1 ? 's' : ''} • Score coming soon` : 'Critic reviews coming soon'}
+                  {reviewCount > 0 ? `${reviewCount} critic review${reviewCount !== 1 ? 's' : ''} • Score available with 5+ reviews` : 'Critic reviews loading...'}
                 </span>
               )}
             </div>

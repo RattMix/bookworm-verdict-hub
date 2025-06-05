@@ -16,24 +16,23 @@ const genres = [
   { id: "Historical Fiction", name: "Historical Fiction", description: "Stories set in the past, bringing historical periods to life through fiction." },
   { id: "Thriller", name: "Thriller", description: "Crime fiction, psychological thrillers, and suspenseful narratives." },
   { id: "Literary Fiction", name: "Literary Fiction", description: "Contemporary and classic works that explore the human experience through sophisticated prose." },
-  { id: "Memoir", name: "Memoir & Biography", description: "Personal narratives and life stories of notable figures." }
+  { id: "Memoir", name: "Memoir & Biography", description: "Personal narratives and life stories of notable figures." },
+  { id: "Science Fiction", name: "Science Fiction", description: "Speculative fiction exploring technology, space, and future societies." },
+  { id: "Mystery", name: "Mystery", description: "Stories focused on solving crimes, puzzles, and unexplained events." }
 ];
 
 const BrowseBooks = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [isLoadingBooks, setIsLoadingBooks] = useState(false);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
 
   const { books, loading, error, totalCount } = useBooks({ 
     limit: 64, 
     sortBy: sortBy as 'newest' | 'critic_score' | 'trending',
     genre: selectedGenre 
   });
-
-  console.log('Books data in BrowseBooks:', books);
-  console.log('Loading state:', loading);
-  console.log('Error state:', error);
-  console.log('Total books in database:', totalCount);
 
   const filteredBooks = books.filter(book => {
     if (!searchQuery) return true;
@@ -46,45 +45,53 @@ const BrowseBooks = () => {
     );
   });
 
-  // Improved function to trigger the book ingestion
+  // Enhanced function to trigger the book ingestion
   const handleIngestBooks = async () => {
     try {
-      console.log('🚀 Starting book ingestion...');
+      setIsLoadingBooks(true);
+      console.log('🚀 Starting book ingestion for 50 popular 2025 books...');
+      
       const { data, error } = await supabase.functions.invoke('ingest-books');
 
       if (error) {
         console.error('❌ Book ingestion error:', error.message || error);
-        alert('Error ingesting books. Please try again.');
+        alert(`Error ingesting books: ${error.message || 'Please try again.'}`);
         return;
       }
 
       console.log('✅ Book ingestion result:', data);
-      alert(`Successfully added ${data.booksAdded} new books!`);
+      alert(`Successfully added ${data.booksAdded} new 2025 books!`);
       window.location.reload();
     } catch (err) {
       console.error('❌ Failed to call book ingestion function:', err);
       alert('Unexpected error during book ingestion.');
+    } finally {
+      setIsLoadingBooks(false);
     }
   };
 
-  // Improved function to trigger the critic review ingestion
+  // Enhanced function to trigger the critic review ingestion
   const handleIngestReviews = async () => {
     try {
+      setIsLoadingReviews(true);
       console.log('🚀 Starting critic review ingestion...');
+      
       const { data, error } = await supabase.functions.invoke('ingest-critic-reviews');
 
       if (error) {
         console.error('❌ Review ingestion error:', error.message || error);
-        alert('Error ingesting critic reviews. Please try again.');
+        alert(`Error ingesting critic reviews: ${error.message || 'Please try again.'}`);
         return;
       }
 
       console.log('✅ Review ingestion result:', data);
-      alert(`Successfully added ${data.reviewsAdded} critic reviews!`);
+      alert(`Successfully added ${data.reviewsAdded} unique critic reviews for ${data.booksProcessed} books!`);
       window.location.reload();
     } catch (err) {
       console.error('❌ Failed to call review ingestion function:', err);
       alert('Unexpected error during review ingestion.');
+    } finally {
+      setIsLoadingReviews(false);
     }
   };
 
@@ -98,27 +105,37 @@ const BrowseBooks = () => {
             Browse Books
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Explore our collection of reviewed titles across all genres
+            Discover the most acclaimed books of 2025 with expert critic reviews
           </p>
         </div>
 
-        {/* Debug buttons - remove after setup */}
-        <div className="mb-8 flex gap-4 justify-center">
-          <Button onClick={handleIngestBooks} variant="outline" className="bg-blue-50">
-            Load 50 Books (Debug)
+        {/* Enhanced debug buttons */}
+        <div className="mb-8 flex gap-4 justify-center flex-wrap">
+          <Button 
+            onClick={handleIngestBooks} 
+            variant="outline" 
+            className="bg-blue-50 hover:bg-blue-100"
+            disabled={isLoadingBooks}
+          >
+            {isLoadingBooks ? "Loading Books..." : "Load 50 Books (2025)"}
           </Button>
-          <Button onClick={handleIngestReviews} variant="outline" className="bg-green-50">
-            Load Critic Reviews (Debug)
+          <Button 
+            onClick={handleIngestReviews} 
+            variant="outline" 
+            className="bg-green-50 hover:bg-green-100"
+            disabled={isLoadingReviews}
+          >
+            {isLoadingReviews ? "Loading Reviews..." : "Load Unique Critic Reviews"}
           </Button>
         </div>
 
-        {/* Catalogue Explainer */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <h3 className="text-lg font-semibold text-slate-800 mb-3">Why only 2025 books?</h3>
+        {/* Updated catalogue explainer */}
+        <div className="max-w-4xl mx-auto mb-8 bg-white rounded-lg p-6 border border-slate-200">
+          <h3 className="text-lg font-semibold text-slate-800 mb-3">📚 Curated 2025 Collection</h3>
           <p className="text-slate-700 leading-relaxed">
-            Our goal is to build the most trusted, independent book review aggregator — with millions of titles across all genres. 
-            To keep things fast and focused while we scale, we're currently prioritising books published in <strong>2025</strong> across key genres. 
-            More books (and more years!) are coming soon.
+            Welcome to our carefully curated collection of the <strong>50 most acclaimed books of 2025</strong>. 
+            Each book features authentic critic reviews from major publications, accurate cover images, and comprehensive metadata. 
+            Our goal is to expand this into the most trusted independent book review aggregator, covering millions of titles across all genres and years.
           </p>
         </div>
 
@@ -159,7 +176,7 @@ const BrowseBooks = () => {
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="newest">Newest Releases</SelectItem>
+                <SelectItem value="newest">Latest 2025 Releases</SelectItem>
                 <SelectItem value="critic_score">Highest Critic Score</SelectItem>
                 <SelectItem value="trending">Trending (5+ Reviews)</SelectItem>
               </SelectContent>
@@ -171,10 +188,10 @@ const BrowseBooks = () => {
         <div className="mb-8">
           <p className="text-gray-600">
             {loading ? (
-              "Loading books..."
+              "Loading 2025 books..."
             ) : (
               <>
-                Showing {filteredBooks.length} of {totalCount} {totalCount === 1 ? 'book' : 'books'}
+                Showing {filteredBooks.length} of {totalCount} {totalCount === 1 ? 'book' : 'books'} from 2025
                 {selectedGenre !== "all" && ` in ${genres.find(g => g.id === selectedGenre)?.name}`}
                 {sortBy === 'trending' && filteredBooks.length > 0 && (
                   <span className="text-blue-600 font-medium"> • Books with 5+ critic reviews</span>
@@ -187,12 +204,16 @@ const BrowseBooks = () => {
         {error && (
           <div className="text-center py-8">
             <p className="text-red-600">Error loading books: {error}</p>
+            <Button onClick={() => window.location.reload()} className="mt-4">
+              Try Again
+            </Button>
           </div>
         )}
 
         {loading ? (
           <div className="text-center py-16">
-            <p className="text-gray-600 text-lg">Loading books...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-800 mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg">Loading 2025 books...</p>
           </div>
         ) : filteredBooks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -201,14 +222,26 @@ const BrowseBooks = () => {
             ))}
           </div>
         ) : totalCount === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-gray-600 text-lg">Our collection is growing!</p>
-            <p className="text-gray-500 mb-4">Use the debug buttons above to load the initial book collection.</p>
+          <div className="text-center py-16 bg-white rounded-lg border border-slate-200">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Ready to Load 2025 Collection</h3>
+            <p className="text-gray-600 text-lg mb-6">Our curated collection of 50 acclaimed 2025 books is ready to be loaded.</p>
+            <div className="space-y-4">
+              <Button 
+                onClick={handleIngestBooks}
+                className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3"
+                disabled={isLoadingBooks}
+              >
+                {isLoadingBooks ? "Loading..." : "Load 50 Books from 2025"}
+              </Button>
+              <p className="text-sm text-gray-500">
+                This will load 50 popular books from 2025 with covers and metadata
+              </p>
+            </div>
           </div>
         ) : sortBy === 'trending' && books.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-600 text-lg">No trending books available yet.</p>
-            <p className="text-gray-500 mb-4">Books need 5+ critic reviews to appear in trending. Reviews are being added regularly.</p>
+            <p className="text-gray-500 mb-4">Books need 5+ critic reviews to appear in trending. Load reviews to see trending books.</p>
             <Button 
               variant="outline" 
               onClick={() => setSortBy("newest")}
