@@ -1,4 +1,3 @@
-
 import { Star, Award, Users, BookOpen, Calendar, Share2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +5,39 @@ import Navigation from "@/components/Navigation";
 import { useParams } from "react-router-dom";
 import { useBooks } from "@/hooks/useBooks";
 import { useCriticReviews } from "@/hooks/useCriticReviews";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { books, loading: booksLoading } = useBooks({ limit: 1000 });
   const book = books.find(b => b.id === id);
   const { reviews, loading: reviewsLoading } = useCriticReviews(id || '');
+
+  // Add a function to trigger the ingestion
+  const handleIngestReviews = async () => {
+    try {
+      console.log('Starting critic review ingestion...');
+      const { data, error } = await supabase.functions.invoke('ingest-critic-reviews');
+      if (error) {
+        console.error('Error ingesting reviews:', error);
+      } else {
+        console.log('Ingestion result:', data);
+        // Refresh the page to see the new reviews
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error('Failed to ingest reviews:', err);
+    }
+  };
+
+  // Debug logging
+  useEffect(() => {
+    console.log('BookDetail - Current book:', book);
+    console.log('BookDetail - Reviews loading:', reviewsLoading);
+    console.log('BookDetail - Reviews:', reviews);
+    console.log('BookDetail - Book ID:', id);
+  }, [book, reviews, reviewsLoading, id]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "bg-emerald-100 text-emerald-800 border-emerald-300";
@@ -64,6 +90,13 @@ const BookDetail = () => {
       <Navigation />
       
       <div className="container mx-auto px-6 py-12">
+        {/* Debug button - remove after testing */}
+        <div className="mb-4">
+          <Button onClick={handleIngestReviews} variant="outline" className="mb-4">
+            Load Critic Reviews (Debug)
+          </Button>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
           {/* Book Cover and Basic Info */}
           <div className="lg:col-span-1">
@@ -191,6 +224,15 @@ const BookDetail = () => {
             {/* Professional Reviews */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 font-serif">Professional Reviews</h2>
+              
+              {/* Debug info */}
+              <div className="mb-4 p-3 bg-gray-100 rounded text-sm">
+                <p>Debug: Reviews loading: {reviewsLoading.toString()}</p>
+                <p>Debug: Reviews count: {reviews.length}</p>
+                <p>Debug: Book ISBN: {book.isbn}</p>
+                <p>Debug: Book ID: {book.id}</p>
+              </div>
+
               {reviewsLoading ? (
                 <div className="text-center py-8">
                   <p className="text-gray-600">Loading critic reviews...</p>
@@ -227,6 +269,9 @@ const BookDetail = () => {
                 <div className="text-center py-8 bg-gray-50 rounded-lg">
                   <p className="text-gray-600 mb-4">No critic reviews available yet.</p>
                   <p className="text-gray-500 text-sm">Professional reviews will be added as they become available.</p>
+                  <Button onClick={handleIngestReviews} variant="outline" className="mt-4">
+                    Load Reviews Now
+                  </Button>
                 </div>
               )}
             </div>
