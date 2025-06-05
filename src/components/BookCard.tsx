@@ -13,6 +13,7 @@ interface Book {
   page_count: number | null;
   critic_quotes: any[];
   summary: string | null;
+  isbn: string | null;
 }
 
 interface BookCardProps {
@@ -36,6 +37,14 @@ const BookCard = ({ book }: BookCardProps) => {
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
+  // Build cover image URL from ISBN
+  const getCoverImageUrl = () => {
+    if (book.isbn) {
+      return `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`;
+    }
+    return "/placeholder.svg";
+  };
+
   // Handle cover image with better fallback
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.currentTarget;
@@ -44,12 +53,14 @@ const BookCard = ({ book }: BookCardProps) => {
     }
   };
 
+  const coverImageUrl = getCoverImageUrl();
+
   return (
     <Link to={`/book/${book.id}`} className="block">
       <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-300 group cursor-pointer">
         <div className="relative">
           <img 
-            src={book.cover_url || "/placeholder.svg"} 
+            src={coverImageUrl}
             alt={`Cover of ${book.title}`}
             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
             onError={handleImageError}
