@@ -123,7 +123,7 @@ const ScoreExplained = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-8 bg-red-500 rounded text-white text-sm font-bold flex items-center justify-center">
-                    <50
+                    &lt;50
                   </div>
                   <span className="font-semibold">Generally Negative Reviews</span>
                 </div>
