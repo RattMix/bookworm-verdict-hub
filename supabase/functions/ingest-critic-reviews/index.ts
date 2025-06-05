@@ -24,7 +24,8 @@ const generateCriticReviews = (isbn: string, title: string, author: string, genr
     "The New York Times Book Review", "The Guardian Books", "Publishers Weekly", 
     "Library Journal", "Kirkus Reviews", "NPR Books", "The Washington Post",
     "Los Angeles Times", "Chicago Tribune", "The Atlantic", "Harper's Magazine",
-    "The New Yorker", "Entertainment Weekly", "USA Today", "Associated Press"
+    "The New Yorker", "Entertainment Weekly", "USA Today", "Associated Press",
+    "BookPage", "Shelf Awareness", "Booklist", "The Boston Globe", "Time Magazine"
   ];
 
   const critics = [
@@ -32,7 +33,8 @@ const generateCriticReviews = (isbn: string, title: string, author: string, genr
     "Lisa Chen", "Robert Kim", "Amanda Foster", "James Wilson", "Maria Garcia",
     "Thomas Anderson", "Jennifer Martinez", "Daniel Lee", "Rachel Green",
     "Christopher Brown", "Sophia Davis", "Alexander Thompson", "Olivia White",
-    "Benjamin Harris", "Isabella Clark", "Samuel Lewis", "Victoria Hall"
+    "Benjamin Harris", "Isabella Clark", "Samuel Lewis", "Victoria Hall",
+    "Nicholas Parker", "Grace Taylor", "Matthew Adams", "Caroline Miller"
   ];
 
   const positiveTemplates = [
@@ -41,8 +43,11 @@ const generateCriticReviews = (isbn: string, title: string, author: string, genr
     `This ${genre[0].toLowerCase()} triumph proves that ${author} is at the height of their creative powers, offering readers an unforgettable literary experience.`,
     `${title} is a tour de force that demonstrates ${author}'s unique voice and ability to craft stories that resonate deeply with modern readers.`,
     `A brilliant exploration of ${genre[0].toLowerCase()} themes that establishes ${author} as one of the most important voices in contemporary fiction.`,
-    `${author}'s latest work is a stunning achievement that combines elegant prose with compelling characters and an engaging plot.`,
-    `This remarkable ${genre[0].toLowerCase()} novel showcases ${author}'s ability to create immersive worlds and authentic characters that linger long after reading.`
+    `${author}'s latest work is a stunning achievement that combines elegant prose with compelling characters and an engaging plot structure.`,
+    `This remarkable ${genre[0].toLowerCase()} novel showcases ${author}'s ability to create immersive worlds and authentic characters that linger long after reading.`,
+    `${title} represents a bold new direction for ${author}, blending ${genre[0].toLowerCase()} elements with profound insights into the human condition.`,
+    `A captivating ${genre[0].toLowerCase()} work that confirms ${author}'s reputation as a master storyteller capable of both entertaining and enlightening readers.`,
+    `${author} has crafted a ${genre[0].toLowerCase()} masterpiece that balances accessibility with literary sophistication, creating a truly memorable reading experience.`
   ];
 
   const reviews: CriticReview[] = [];
@@ -52,7 +57,7 @@ const generateCriticReviews = (isbn: string, title: string, author: string, genr
   for (let i = 0; i < 6; i++) { // Generate 6 reviews per book
     let critic, publication;
     
-    // Ensure unique critics and publications
+    // Ensure unique critics and publications per book
     do {
       critic = critics[Math.floor(Math.random() * critics.length)];
     } while (usedCritics.has(critic));
@@ -105,6 +110,7 @@ serve(async (req) => {
 
     if (deleteError) {
       console.error('❌ Error clearing existing reviews:', deleteError)
+      throw new Error(`Failed to clear existing reviews: ${deleteError.message}`)
     } else {
       console.log('✅ Successfully cleared existing reviews')
     }
@@ -116,16 +122,22 @@ serve(async (req) => {
       .not('isbn', 'is', null)
 
     if (booksError) {
-      throw booksError
+      console.error('❌ Error fetching books:', booksError)
+      throw new Error(`Failed to fetch books: ${booksError.message}`)
     }
 
-    console.log(`📚 Found ${books?.length || 0} books with ISBNs`)
+    if (!books || books.length === 0) {
+      throw new Error('No books found in database. Please ingest books first.')
+    }
+
+    console.log(`📚 Found ${books.length} books with ISBNs`)
 
     let totalReviewsAdded = 0
     let booksWithReviews = 0
+    const failedBooks = []
 
     // Process each book and generate unique reviews
-    for (const book of books || []) {
+    for (const book of books) {
       try {
         console.log(`\n📖 Processing: "${book.title}" by ${book.author}`)
         console.log(`   Book ID: ${book.id}`)
@@ -167,22 +179,27 @@ serve(async (req) => {
 
         if (validReviews > 0) {
           booksWithReviews++
+        } else {
+          failedBooks.push(book.title)
         }
 
         // Small delay between books
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise(resolve => setTimeout(resolve, 150))
 
       } catch (bookErr) {
         console.error(`❌ Error processing book "${book.title}":`, bookErr)
+        failedBooks.push(book.title)
       }
     }
 
     // Update calculated critic scores for all books
     console.log('\n🔄 Updating calculated critic scores...')
-    for (const book of books || []) {
+    let scoresUpdated = 0
+    for (const book of books) {
       try {
         await supabaseClient.rpc('update_book_critic_score', { book_uuid: book.id })
         console.log(`✅ Updated critic score for "${book.title}"`)
+        scoresUpdated++
       } catch (updateErr) {
         console.error(`❌ Failed to update critic score for "${book.title}":`, updateErr)
       }
@@ -191,14 +208,21 @@ serve(async (req) => {
     console.log(`\n🎉 Comprehensive ingestion complete!`)
     console.log(`   📊 Reviews added: ${totalReviewsAdded}`)
     console.log(`   📚 Books with reviews: ${booksWithReviews}`)
+    console.log(`   🔄 Scores updated: ${scoresUpdated}`)
+
+    if (failedBooks.length > 0) {
+      console.log(`   ⚠️ Failed books: ${failedBooks.join(', ')}`)
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         reviewsAdded: totalReviewsAdded,
         booksProcessed: booksWithReviews,
+        scoresUpdated,
         message: `Successfully ingested ${totalReviewsAdded} unique critic reviews for ${booksWithReviews} books`,
-        averageReviewsPerBook: Math.round(totalReviewsAdded / booksWithReviews)
+        averageReviewsPerBook: Math.round(totalReviewsAdded / booksWithReviews),
+        failedBooks: failedBooks.length > 0 ? failedBooks : undefined
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -209,7 +233,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        success: false 
+        success: false,
+        details: 'Check the function logs for more information'
       }),
       { 
         status: 500,

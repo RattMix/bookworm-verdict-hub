@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Filter, SortDesc } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,7 @@ const BrowseBooks = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [isLoadingBooks, setIsLoadingBooks] = useState(false);
   const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>("");
 
   const { books, loading, error, totalCount } = useBooks({ 
     limit: 64, 
@@ -45,53 +45,121 @@ const BrowseBooks = () => {
     );
   });
 
-  // Enhanced function to trigger the book ingestion
+  const addDebugInfo = (message: string) => {
+    console.log(message);
+    setDebugInfo(prev => prev + "\n" + new Date().toLocaleTimeString() + ": " + message);
+  };
+
+  // Enhanced function to trigger the book ingestion with detailed logging
   const handleIngestBooks = async () => {
     try {
       setIsLoadingBooks(true);
-      console.log('🚀 Starting book ingestion for 50 popular 2025 books...');
+      setDebugInfo("");
+      addDebugInfo('🚀 Starting book ingestion...');
+      
+      // First check current book count
+      const { count: currentCount } = await supabase
+        .from('books')
+        .select('*', { count: 'exact', head: true });
+      
+      addDebugInfo(`📊 Current books in database: ${currentCount || 0}`);
       
       const { data, error } = await supabase.functions.invoke('ingest-books');
 
       if (error) {
-        console.error('❌ Book ingestion error:', error.message || error);
-        alert(`Error ingesting books: ${error.message || 'Please try again.'}`);
+        addDebugInfo(`❌ Book ingestion error: ${JSON.stringify(error)}`);
+        alert(`Error ingesting books: ${error.message || JSON.stringify(error)}`);
         return;
       }
 
-      console.log('✅ Book ingestion result:', data);
-      alert(`Successfully added ${data.booksAdded} new 2025 books!`);
-      window.location.reload();
+      addDebugInfo(`✅ Book ingestion result: ${JSON.stringify(data)}`);
+      
+      // Check new count
+      const { count: newCount } = await supabase
+        .from('books')
+        .select('*', { count: 'exact', head: true });
+      
+      addDebugInfo(`📊 Books in database after ingestion: ${newCount || 0}`);
+      
+      alert(`Successfully added ${data?.booksAdded || 0} new 2025 books!`);
+      
+      // Force refresh the page data
+      setTimeout(() => window.location.reload(), 1000);
     } catch (err) {
-      console.error('❌ Failed to call book ingestion function:', err);
+      addDebugInfo(`❌ Failed to call book ingestion function: ${JSON.stringify(err)}`);
       alert('Unexpected error during book ingestion.');
     } finally {
       setIsLoadingBooks(false);
     }
   };
 
-  // Enhanced function to trigger the critic review ingestion
+  // Enhanced function to trigger the critic review ingestion with detailed logging
   const handleIngestReviews = async () => {
     try {
       setIsLoadingReviews(true);
-      console.log('🚀 Starting critic review ingestion...');
+      addDebugInfo('🚀 Starting critic review ingestion...');
+      
+      // Check current review count
+      const { count: currentReviews } = await supabase
+        .from('critic_reviews')
+        .select('*', { count: 'exact', head: true });
+      
+      addDebugInfo(`📊 Current reviews in database: ${currentReviews || 0}`);
       
       const { data, error } = await supabase.functions.invoke('ingest-critic-reviews');
 
       if (error) {
-        console.error('❌ Review ingestion error:', error.message || error);
-        alert(`Error ingesting critic reviews: ${error.message || 'Please try again.'}`);
+        addDebugInfo(`❌ Review ingestion error: ${JSON.stringify(error)}`);
+        alert(`Error ingesting critic reviews: ${error.message || JSON.stringify(error)}`);
         return;
       }
 
-      console.log('✅ Review ingestion result:', data);
-      alert(`Successfully added ${data.reviewsAdded} unique critic reviews for ${data.booksProcessed} books!`);
-      window.location.reload();
+      addDebugInfo(`✅ Review ingestion result: ${JSON.stringify(data)}`);
+      
+      // Check new review count
+      const { count: newReviews } = await supabase
+        .from('critic_reviews')
+        .select('*', { count: 'exact', head: true });
+      
+      addDebugInfo(`📊 Reviews in database after ingestion: ${newReviews || 0}`);
+      
+      alert(`Successfully added ${data?.reviewsAdded || 0} unique critic reviews for ${data?.booksProcessed || 0} books!`);
+      
+      // Force refresh the page data
+      setTimeout(() => window.location.reload(), 1000);
     } catch (err) {
-      console.error('❌ Failed to call review ingestion function:', err);
+      addDebugInfo(`❌ Failed to call review ingestion function: ${JSON.stringify(err)}`);
       alert('Unexpected error during review ingestion.');
     } finally {
       setIsLoadingReviews(false);
+    }
+  };
+
+  // Function to check database status
+  const checkDatabaseStatus = async () => {
+    try {
+      addDebugInfo('🔍 Checking database status...');
+      
+      const { count: bookCount } = await supabase
+        .from('books')
+        .select('*', { count: 'exact', head: true });
+      
+      const { count: reviewCount } = await supabase
+        .from('critic_reviews')
+        .select('*', { count: 'exact', head: true });
+      
+      const { data: sampleBooks } = await supabase
+        .from('books')
+        .select('title, calculated_critic_score, critic_review_count')
+        .limit(3);
+      
+      addDebugInfo(`📊 Database Status:
+        - Books: ${bookCount || 0}
+        - Reviews: ${reviewCount || 0}
+        - Sample books: ${JSON.stringify(sampleBooks, null, 2)}`);
+        
+    } catch (err) {
+      addDebugInfo(`❌ Database check failed: ${JSON.stringify(err)}`);
     }
   };
 
@@ -109,7 +177,7 @@ const BrowseBooks = () => {
           </p>
         </div>
 
-        {/* Enhanced debug buttons */}
+        {/* Enhanced debug buttons with status checking */}
         <div className="mb-8 flex gap-4 justify-center flex-wrap">
           <Button 
             onClick={handleIngestBooks} 
@@ -127,7 +195,30 @@ const BrowseBooks = () => {
           >
             {isLoadingReviews ? "Loading Reviews..." : "Load Unique Critic Reviews"}
           </Button>
+          <Button 
+            onClick={checkDatabaseStatus} 
+            variant="outline" 
+            className="bg-yellow-50 hover:bg-yellow-100"
+          >
+            Check Database Status
+          </Button>
         </div>
+
+        {/* Debug info display */}
+        {debugInfo && (
+          <div className="mb-8 bg-gray-100 p-4 rounded-lg">
+            <h3 className="font-semibold mb-2">Debug Information:</h3>
+            <pre className="text-xs overflow-auto max-h-40 whitespace-pre-wrap">{debugInfo}</pre>
+            <Button 
+              onClick={() => setDebugInfo("")} 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+            >
+              Clear Debug Info
+            </Button>
+          </div>
+        )}
 
         {/* Updated catalogue explainer */}
         <div className="max-w-4xl mx-auto mb-8 bg-white rounded-lg p-6 border border-slate-200">
