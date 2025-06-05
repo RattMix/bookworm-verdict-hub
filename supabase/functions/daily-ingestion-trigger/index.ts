@@ -1,46 +1,58 @@
 
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    console.log('Daily ingestion trigger activated');
+    console.log('Starting daily critic review ingestion trigger...')
 
-    // Call the ingest-books function
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const response = await fetch(`${supabaseUrl}/functions/v1/ingest-books`, {
+    // Call the critic review ingestion function
+    const ingestionUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/ingest-critic-reviews`
+    const response = await fetch(ingestionUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({})
-    });
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        'Content-Type': 'application/json'
+      }
+    })
 
-    const result = await response.json();
+    const result = await response.json()
     
-    console.log('Daily ingestion completed:', result);
+    if (!response.ok) {
+      throw new Error(`Ingestion failed: ${result.error || response.statusText}`)
+    }
 
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    console.log('Daily ingestion completed successfully:', result)
 
-  } catch (error) {
-    console.error('Error in daily-ingestion-trigger:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        success: true,
+        message: 'Daily critic review ingestion completed',
+        details: result
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+  } catch (error) {
+    console.error('Error in daily ingestion trigger:', error)
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        success: false 
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
-    );
+    )
   }
-});
+})

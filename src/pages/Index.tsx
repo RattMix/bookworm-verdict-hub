@@ -7,6 +7,7 @@ import BookCard from "@/components/BookCard";
 import ReviewCard from "@/components/ReviewCard";
 import Navigation from "@/components/Navigation";
 import { useBooks } from "@/hooks/useBooks";
+import { supabase } from "@/integrations/supabase/client";
 
 // Real critic reviews from actual publications - no fake user reviews
 const recentReviews = [
@@ -50,12 +51,45 @@ const recentReviews = [
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { books: featuredBooks, loading, error, totalCount } = useBooks({ limit: 6, sortBy: 'trending' });
+  const [stats, setStats] = useState({
+    booksWithReviews: 0,
+    totalPublications: 5 // The 5 trusted sources we use
+  });
+  
+  // Get trending books (those with highest critic scores)
+  const { books: trendingBooks, loading, error, totalCount } = useBooks({ 
+    limit: 6, 
+    sortBy: 'trending' 
+  });
 
-  console.log('Featured books data:', featuredBooks);
+  console.log('Trending books data:', trendingBooks);
   console.log('Loading state:', loading);
   console.log('Error state:', error);
   console.log('Total books in database:', totalCount);
+
+  // Fetch stats for books with critic reviews
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Count books with calculated critic scores (5+ reviews)
+        const { count: booksWithReviews } = await supabase
+          .from('books')
+          .select('id', { count: 'exact', head: true })
+          .not('calculated_critic_score', 'is', null);
+
+        setStats({
+          booksWithReviews: booksWithReviews || 0,
+          totalPublications: 5
+        });
+
+        console.log('Stats updated:', { booksWithReviews, totalPublications: 5 });
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -94,13 +128,13 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
               <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
                 <div className="text-3xl font-bold text-slate-100">
-                  {loading ? "..." : totalCount > 0 ? totalCount.toLocaleString() : "Growing"}+
+                  {loading ? "..." : stats.booksWithReviews > 0 ? stats.booksWithReviews.toLocaleString() : "Growing"}+
                 </div>
-                <div className="text-slate-300 font-medium">Books Reviewed</div>
+                <div className="text-slate-300 font-medium">Books with Critic Scores</div>
               </div>
               <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                <div className="text-3xl font-bold text-slate-100">200+</div>
-                <div className="text-slate-300 font-medium">Publications</div>
+                <div className="text-3xl font-bold text-slate-100">{stats.totalPublications}+</div>
+                <div className="text-slate-300 font-medium">Trusted Publications</div>
               </div>
               <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
                 <div className="text-3xl font-bold text-slate-100">Daily</div>
@@ -138,7 +172,7 @@ const Index = () => {
               <h2 className="text-4xl font-bold text-gray-800 font-serif mb-2">
                 Currently Trending
               </h2>
-              <p className="text-gray-600">Books receiving significant critical attention</p>
+              <p className="text-gray-600">Books with the highest critic scores (5+ reviews required)</p>
             </div>
             <Button variant="outline" className="text-slate-700 border-slate-700 hover:bg-slate-50 rounded-lg px-6 py-3 font-semibold">
               Browse All Books
@@ -153,18 +187,18 @@ const Index = () => {
           
           {loading ? (
             <div className="text-center py-8">
-              <p className="text-gray-600">Loading latest books...</p>
+              <p className="text-gray-600">Loading trending books...</p>
             </div>
-          ) : featuredBooks.length > 0 ? (
+          ) : trendingBooks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredBooks.slice(0, 3).map((book) => (
+              {trendingBooks.slice(0, 3).map((book) => (
                 <BookCard key={book.id} book={book} />
               ))}
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600">No books available yet.</p>
-              <p className="text-gray-500 text-sm mt-2">New books are being added regularly. Check back soon for the latest releases.</p>
+              <p className="text-gray-600">No trending books available yet.</p>
+              <p className="text-gray-500 text-sm mt-2">Books need 5+ critic reviews to appear in trending. New reviews are being added regularly.</p>
             </div>
           )}
         </div>

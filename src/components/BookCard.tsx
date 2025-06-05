@@ -8,6 +8,8 @@ interface Book {
   author: string;
   cover_url: string | null;
   critic_score: number | null;
+  calculated_critic_score: number | null;
+  critic_review_count: number | null;
   genre: string[];
   published_date: string | null;
   page_count: number | null;
@@ -33,7 +35,10 @@ const BookCard = ({ book }: BookCardProps) => {
     return new Date(dateString).getFullYear();
   };
 
-  const reviewCount = Array.isArray(book.critic_quotes) ? book.critic_quotes.length : 0;
+  // Use calculated_critic_score if available (requires 5+ reviews), otherwise show "coming soon"
+  const hasValidCriticScore = book.calculated_critic_score !== null && (book.critic_review_count || 0) >= 5;
+  const displayScore = hasValidCriticScore ? book.calculated_critic_score : null;
+  const reviewCount = book.critic_review_count || 0;
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
@@ -100,15 +105,19 @@ const BookCard = ({ book }: BookCardProps) => {
               <div className="bg-blue-100 p-1.5 rounded-full">
                 <Award className="h-4 w-4 text-blue-600" />
               </div>
-              {book.critic_score ? (
+              {hasValidCriticScore && displayScore ? (
                 <>
-                  <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getScoreColor(book.critic_score)}`}>
-                    {book.critic_score}
+                  <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getScoreColor(displayScore)}`}>
+                    {Math.round(displayScore)}
                   </span>
-                  <span className="text-sm text-gray-600">Critic Score</span>
+                  <span className="text-sm text-gray-600">
+                    {reviewCount} critic{reviewCount !== 1 ? 's' : ''}
+                  </span>
                 </>
               ) : (
-                <span className="text-sm text-gray-500 italic">Critic reviews coming soon</span>
+                <span className="text-sm text-gray-500 italic">
+                  {reviewCount > 0 ? `${reviewCount} critic review${reviewCount !== 1 ? 's' : ''} • Score coming soon` : 'Critic reviews coming soon'}
+                </span>
               )}
             </div>
           </div>

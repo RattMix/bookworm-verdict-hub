@@ -3,46 +3,16 @@ import { Star, Award, Users, BookOpen, Calendar, Share2, Heart } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
-
-const bookData = {
-  title: "Tomorrow, and Tomorrow, and Tomorrow",
-  author: "Gabrielle Zevin",
-  isbn: "9780593321201",
-  genre: ["Literary Fiction", "Contemporary"],
-  publishYear: 2022,
-  pageCount: 416,
-  publisher: "Knopf",
-  plotSummary: "On a bitter-cold day, in the December of his junior year at Harvard, Sam Masur exits a subway car and sees, amid the hordes of people waiting on the platform, Sadie Green. He calls her name. A decade-plus worth of history falls between them.",
-  criticScore: 86,
-  criticReviewCount: 34,
-  criticConsensus: "Zevin crafts a sophisticated meditation on creativity, friendship, and digital culture that manages to be both intellectually ambitious and emotionally resonant."
-};
-
-const criticReviews = [
-  {
-    id: "1",
-    excerpt: "A dazzling and intricately imagined novel that blurs the lines between reality and fantasy, work and play, commerce and art.",
-    reviewer: "Dwight Garner",
-    publication: "The New York Times",
-    rating: 9
-  },
-  {
-    id: "2", 
-    excerpt: "Zevin has written a love letter to creative collaboration and the games that shape our lives, both digital and analog.",
-    reviewer: "Heller McAlpin",
-    publication: "NPR",
-    rating: 8
-  },
-  {
-    id: "3",
-    excerpt: "A brilliant exploration of friendship, ambition, and the cost of creative success in the digital age.",
-    reviewer: "Bethanne Patrick",
-    publication: "The Washington Post",
-    rating: 9
-  }
-];
+import { useParams } from "react-router-dom";
+import { useBooks } from "@/hooks/useBooks";
+import { useCriticReviews } from "@/hooks/useCriticReviews";
 
 const BookDetail = () => {
+  const { id } = useParams<{ id: string }>();
+  const { books, loading: booksLoading } = useBooks({ limit: 1000 });
+  const book = books.find(b => b.id === id);
+  const { reviews, loading: reviewsLoading } = useCriticReviews(id || '');
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return "bg-emerald-100 text-emerald-800 border-emerald-300";
     if (score >= 60) return "bg-amber-100 text-amber-800 border-amber-300";
@@ -51,14 +21,43 @@ const BookDetail = () => {
 
   // Improved cover image handling for book detail page
   const getCoverImageUrl = () => {
-    if (bookData.isbn && bookData.isbn.trim()) {
-      const cleanIsbn = bookData.isbn.replace(/[-\s]/g, '');
+    if (book?.isbn && book.isbn.trim()) {
+      const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
       const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
       console.log(`Book detail cover URL: ${openLibraryUrl}`);
       return openLibraryUrl;
     }
     return "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
   };
+
+  const hasValidCriticScore = book?.calculated_critic_score !== null && (book?.critic_review_count || 0) >= 5;
+  const displayScore = hasValidCriticScore ? book?.calculated_critic_score : null;
+
+  if (booksLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
+        <Navigation />
+        <div className="container mx-auto px-6 py-12">
+          <div className="text-center">
+            <p className="text-gray-600">Loading book details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!book) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
+        <Navigation />
+        <div className="container mx-auto px-6 py-12">
+          <div className="text-center">
+            <p className="text-gray-600">Book not found.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -71,7 +70,7 @@ const BookDetail = () => {
             <div className="bg-white rounded-xl shadow-md p-6 sticky top-24 border border-slate-200">
               <img 
                 src={getCoverImageUrl()} 
-                alt={bookData.title}
+                alt={book.title}
                 className="w-full h-96 object-cover rounded-lg mb-6"
                 onError={(e) => {
                   console.log(`Book detail image failed: ${e.currentTarget.src}`);
@@ -82,12 +81,12 @@ const BookDetail = () => {
               
               <div className="space-y-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-800 mb-2 font-serif">{bookData.title}</h1>
-                  <p className="text-lg text-gray-600">by {bookData.author}</p>
+                  <h1 className="text-2xl font-bold text-gray-800 mb-2 font-serif">{book.title}</h1>
+                  <p className="text-lg text-gray-600">by {book.author}</p>
                 </div>
                 
                 <div className="flex flex-wrap gap-2">
-                  {bookData.genre.map((g) => (
+                  {book.genre?.map((g) => (
                     <Badge key={g} variant="outline" className="text-slate-600 border-slate-400">
                       {g}
                     </Badge>
@@ -97,11 +96,11 @@ const BookDetail = () => {
                 <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    {bookData.publishYear}
+                    {book.published_date ? new Date(book.published_date).getFullYear() : 'TBD'}
                   </div>
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4" />
-                    {bookData.pageCount} pages
+                    {book.page_count || 'TBD'} pages
                   </div>
                 </div>
                 
@@ -135,12 +134,30 @@ const BookDetail = () => {
                     <Award className="h-6 w-6 text-blue-600" />
                     <h3 className="text-lg font-semibold">Critic Score</h3>
                   </div>
-                  <div className={`inline-flex items-center px-6 py-3 rounded-full text-3xl font-bold border-2 ${getScoreColor(bookData.criticScore)}`}>
-                    {bookData.criticScore}
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Based on {bookData.criticReviewCount} professional reviews
-                  </p>
+                  {hasValidCriticScore && displayScore ? (
+                    <>
+                      <div className={`inline-flex items-center px-6 py-3 rounded-full text-3xl font-bold border-2 ${getScoreColor(displayScore)}`}>
+                        {Math.round(displayScore)}
+                      </div>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Based on {book.critic_review_count} professional reviews
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-center">
+                        <div className="text-gray-500 mb-2">
+                          {book.critic_review_count && book.critic_review_count > 0 
+                            ? `${book.critic_review_count} review${book.critic_review_count !== 1 ? 's' : ''} • Score coming soon`
+                            : 'Coming Soon'
+                          }
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Critic score available with 5+ reviews
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </div>
                 
                 <div className="text-center">
@@ -159,16 +176,12 @@ const BookDetail = () => {
             </div>
             
             {/* Plot Summary */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 font-serif">Plot Summary</h2>
-              <p className="text-gray-700 leading-relaxed">{bookData.plotSummary}</p>
-            </div>
-            
-            {/* Critic Consensus */}
-            <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 font-serif">Critic Consensus</h2>
-              <p className="text-gray-700 leading-relaxed italic">{bookData.criticConsensus}</p>
-            </div>
+            {book.summary && (
+              <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4 font-serif">Plot Summary</h2>
+                <p className="text-gray-700 leading-relaxed">{book.summary}</p>
+              </div>
+            )}
 
             {/* Ad Slot - Inline */}
             <div className="ad-slot-inline" style={{minHeight: '250px', background: '#fafafa', margin: '2rem 0', textAlign: 'center', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px'}}>
@@ -178,29 +191,44 @@ const BookDetail = () => {
             {/* Professional Reviews */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 font-serif">Professional Reviews</h2>
-              <div className="space-y-6">
-                {criticReviews.map((review) => (
-                  <div key={review.id} className="border-l-4 border-blue-500 pl-6">
-                    <p className="text-gray-700 text-lg mb-3 leading-relaxed">"{review.excerpt}"</p>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < review.rating / 2 
-                                ? "fill-yellow-400 text-yellow-400" 
-                                : "text-gray-300"
-                            }`}
-                          />
-                        ))}
+              {reviewsLoading ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">Loading critic reviews...</p>
+                </div>
+              ) : reviews.length > 0 ? (
+                <div className="space-y-6">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="border-l-4 border-blue-500 pl-6">
+                      <p className="text-gray-700 text-lg mb-3 leading-relaxed">"{review.review_quote}"</p>
+                      <div className="flex items-center gap-4">
+                        {review.rating && (
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="font-semibold text-gray-800">{review.rating}/100</span>
+                          </div>
+                        )}
+                        <span className="font-semibold text-gray-800">{review.critic_name}</span>
+                        <span className="text-gray-600">{review.publication}</span>
+                        {review.review_url && (
+                          <a 
+                            href={review.review_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 text-sm"
+                          >
+                            Read Full Review →
+                          </a>
+                        )}
                       </div>
-                      <span className="font-semibold text-gray-800">{review.reviewer}</span>
-                      <span className="text-gray-600">{review.publication}</span>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                  <p className="text-gray-600 mb-4">No critic reviews available yet.</p>
+                  <p className="text-gray-500 text-sm">Professional reviews will be added as they become available.</p>
+                </div>
+              )}
             </div>
             
             {/* Reader Reviews Section */}

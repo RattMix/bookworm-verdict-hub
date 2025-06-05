@@ -14,6 +14,8 @@ interface Book {
   summary: string | null;
   critic_score: number | null;
   critic_quotes: any;
+  calculated_critic_score: number | null;
+  critic_review_count: number | null;
   created_at: string;
 }
 
@@ -41,7 +43,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         
         let query = supabase
           .from('books')
-          .select('id, title, author, published_date, genre, page_count, isbn, cover_url, summary, critic_score, critic_quotes, created_at', { count: 'exact' });
+          .select('id, title, author, published_date, genre, page_count, isbn, cover_url, summary, critic_score, critic_quotes, calculated_critic_score, critic_review_count, created_at', { count: 'exact' });
 
         // Filter by genre if specified
         if (genre && genre !== 'all') {
@@ -51,10 +53,13 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         // Apply sorting
         switch (sortBy) {
           case 'critic_score':
-            query = query.order('critic_score', { ascending: false });
+            query = query.order('calculated_critic_score', { ascending: false, nullsLast: true });
             break;
           case 'trending':
-            query = query.order('created_at', { ascending: false });
+            // For trending, prioritize books with valid critic scores (5+ reviews)
+            query = query
+              .not('calculated_critic_score', 'is', null)
+              .order('calculated_critic_score', { ascending: false });
             break;
           default:
             query = query.order('created_at', { ascending: false });
@@ -84,7 +89,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         }));
 
         console.log('Formatted books:', formattedBooks);
-        console.log('Sample formatted book ISBN:', formattedBooks[0]?.isbn);
+        console.log('Sample formatted book critic score:', formattedBooks[0]?.calculated_critic_score);
         setBooks(formattedBooks);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch books';

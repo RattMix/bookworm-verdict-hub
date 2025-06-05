@@ -108,7 +108,7 @@ const BrowseBooks = () => {
               <SelectContent>
                 <SelectItem value="newest">Newest Releases</SelectItem>
                 <SelectItem value="critic_score">Highest Critic Score</SelectItem>
-                <SelectItem value="trending">Trending</SelectItem>
+                <SelectItem value="trending">Trending (5+ Reviews)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -123,6 +123,9 @@ const BrowseBooks = () => {
               <>
                 Showing {filteredBooks.length} of {totalCount} {totalCount === 1 ? 'book' : 'books'}
                 {selectedGenre !== "all" && ` in ${genres.find(g => g.id === selectedGenre)?.name}`}
+                {sortBy === 'trending' && filteredBooks.length > 0 && (
+                  <span className="text-blue-600 font-medium"> • Books with 5+ critic reviews</span>
+                )}
               </>
             )}
           </p>
@@ -149,6 +152,18 @@ const BrowseBooks = () => {
             <p className="text-gray-600 text-lg">Our collection is growing!</p>
             <p className="text-gray-500 mb-4">New books are being added regularly. Check back soon for the latest releases.</p>
           </div>
+        ) : sortBy === 'trending' && books.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-gray-600 text-lg">No trending books available yet.</p>
+            <p className="text-gray-500 mb-4">Books need 5+ critic reviews to appear in trending. Reviews are being added regularly.</p>
+            <Button 
+              variant="outline" 
+              onClick={() => setSortBy("newest")}
+              className="mt-4"
+            >
+              View All Books Instead
+            </Button>
+          </div>
         ) : (
           <div className="text-center py-16">
             <p className="text-gray-600 text-lg">No books found matching your criteria.</p>
@@ -157,6 +172,7 @@ const BrowseBooks = () => {
               onClick={() => {
                 setSearchQuery("");
                 setSelectedGenre("all");
+                setSortBy("newest");
               }}
               className="mt-4"
             >

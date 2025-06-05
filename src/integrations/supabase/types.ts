@@ -12,9 +12,11 @@ export type Database = {
       books: {
         Row: {
           author: string
+          calculated_critic_score: number | null
           cover_url: string | null
           created_at: string
           critic_quotes: Json | null
+          critic_review_count: number | null
           critic_score: number | null
           genre: string[] | null
           id: string
@@ -27,9 +29,11 @@ export type Database = {
         }
         Insert: {
           author: string
+          calculated_critic_score?: number | null
           cover_url?: string | null
           created_at?: string
           critic_quotes?: Json | null
+          critic_review_count?: number | null
           critic_score?: number | null
           genre?: string[] | null
           id?: string
@@ -42,9 +46,11 @@ export type Database = {
         }
         Update: {
           author?: string
+          calculated_critic_score?: number | null
           cover_url?: string | null
           created_at?: string
           critic_quotes?: Json | null
+          critic_review_count?: number | null
           critic_score?: number | null
           genre?: string[] | null
           id?: string
@@ -57,12 +63,65 @@ export type Database = {
         }
         Relationships: []
       }
+      critic_reviews: {
+        Row: {
+          book_id: string
+          created_at: string
+          critic_name: string
+          id: string
+          isbn: string | null
+          publication: string
+          rating: number | null
+          review_date: string | null
+          review_quote: string
+          review_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          critic_name: string
+          id?: string
+          isbn?: string | null
+          publication: string
+          rating?: number | null
+          review_date?: string | null
+          review_quote: string
+          review_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          critic_name?: string
+          id?: string
+          isbn?: string | null
+          publication?: string
+          rating?: number | null
+          review_date?: string | null
+          review_quote?: string
+          review_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "critic_reviews_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_book_critic_score: {
+        Args: { book_uuid: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
