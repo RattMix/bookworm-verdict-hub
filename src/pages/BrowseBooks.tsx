@@ -146,14 +146,8 @@ const BrowseBooks = () => {
           </div>
         ) : totalCount === 0 ? (
           <div className="text-center py-16">
-            <p className="text-gray-600 text-lg">No books available yet.</p>
-            <p className="text-gray-500 mb-4">Books will appear here once the ingestion process runs.</p>
-            <Button 
-              onClick={() => window.location.reload()} 
-              variant="outline"
-            >
-              Refresh Page
-            </Button>
+            <p className="text-gray-600 text-lg">Our collection is growing!</p>
+            <p className="text-gray-500 mb-4">New books are being added regularly. Check back soon for the latest releases.</p>
           </div>
         ) : (
           <div className="text-center py-16">

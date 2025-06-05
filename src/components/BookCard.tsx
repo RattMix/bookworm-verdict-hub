@@ -36,17 +36,24 @@ const BookCard = ({ book }: BookCardProps) => {
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
+  // Handle cover image with better fallback
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    if (target.src !== "/placeholder.svg") {
+      target.src = "/placeholder.svg";
+    }
+  };
+
   return (
     <Link to={`/book/${book.id}`} className="block">
       <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-300 group cursor-pointer">
         <div className="relative">
           <img 
             src={book.cover_url || "/placeholder.svg"} 
-            alt={book.title}
+            alt={`Cover of ${book.title}`}
             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              e.currentTarget.src = "/placeholder.svg";
-            }}
+            onError={handleImageError}
+            loading="lazy"
           />
           <div className="absolute top-3 right-3">
             <span className="bg-slate-800 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
@@ -66,7 +73,7 @@ const BookCard = ({ book }: BookCardProps) => {
             </p>
           )}
           
-          {/* Summary/Subject */}
+          {/* Summary */}
           {book.summary && (
             <p className="text-gray-600 text-sm mb-4 line-clamp-2">
               {book.summary}

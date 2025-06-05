@@ -17,12 +17,7 @@ interface OpenLibraryBook {
   number_of_pages_median?: number;
   first_publish_year?: number;
   key?: string;
-}
-
-interface CriticQuote {
-  quote: string;
-  source: string;
-  reviewer?: string;
+  language?: string[];
 }
 
 serve(async (req) => {
@@ -35,92 +30,154 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log('Starting 2025 book ingestion from Open Library...');
+    console.log('Starting enhanced 2025 book ingestion from Open Library...');
 
-    // Target genres for 2025 books
+    // Broader subject searches to increase success rate
     const targetSubjects = [
-      'fantasy',
+      'fiction',
       'romance', 
-      'historical_fiction',
-      'thriller',
-      'suspense',
-      'literary_fiction',
-      'memoir',
+      'fantasy',
       'biography',
+      'thriller',
+      'historical',
+      'literary',
+      'mystery',
       'science_fiction',
-      'mystery'
+      'contemporary'
     ];
 
     const allBooks: OpenLibraryBook[] = [];
+    let processedCount = 0;
+    const targetBookCount = 25; // Aim for at least 25 books
 
-    // Search for books published in 2025 across target subjects
+    // Primary search for 2025 books
     for (const subject of targetSubjects) {
+      if (processedCount >= targetBookCount) break;
+      
       console.log(`Searching for ${subject} books from 2025...`);
       
       try {
         const response = await fetch(
-          `https://openlibrary.org/search.json?subject=${subject}&publish_year=2025&language=eng&sort=new&limit=15&has_fulltext=false`
+          `https://openlibrary.org/search.json?subject=${subject}&publish_year=2025&language=eng&sort=new&limit=20&has_fulltext=false`
         );
         
-        if (!response.ok) {
-          console.log(`Failed to fetch ${subject} books: ${response.status}`);
-          continue;
-        }
-        
-        const data = await response.json();
-        if (data.docs && data.docs.length > 0) {
-          console.log(`Found ${data.docs.length} ${subject} books`);
-          allBooks.push(...data.docs);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.docs && data.docs.length > 0) {
+            console.log(`Found ${data.docs.length} ${subject} books from 2025`);
+            allBooks.push(...data.docs);
+          }
         }
       } catch (error) {
         console.error(`Error fetching ${subject} books:`, error);
       }
 
-      // Small delay to be respectful to the API
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 300));
     }
 
-    console.log(`Total books found: ${allBooks.length}`);
+    // Fallback: search for recent books if 2025 yields too few results
+    if (allBooks.length < 50) {
+      console.log('Insufficient 2025 books found, searching 2024 as fallback...');
+      
+      const fallbackSubjects = ['fiction', 'romance', 'fantasy', 'biography', 'thriller'];
+      for (const subject of fallbackSubjects) {
+        if (allBooks.length >= 100) break;
+        
+        try {
+          const response = await fetch(
+            `https://openlibrary.org/search.json?subject=${subject}&publish_year=2024&language=eng&sort=new&limit=15&has_fulltext=false`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.docs && data.docs.length > 0) {
+              console.log(`Found ${data.docs.length} ${subject} books from 2024`);
+              allBooks.push(...data.docs);
+            }
+          }
+        } catch (error) {
+          console.error(`Error fetching fallback ${subject} books:`, error);
+        }
 
-    let processedCount = 0;
-    const maxBooksPerBatch = 100;
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+    }
 
+    console.log(`Total books collected: ${allBooks.length}`);
+
+    // Process books with more lenient filtering
+    const seenIsbns = new Set<string>();
+    
     for (const book of allBooks) {
-      if (processedCount >= maxBooksPerBatch) break;
+      if (processedCount >= targetBookCount) break;
 
-      // Skip books without required fields
-      if (!book.title || !book.author_name || !book.isbn || !book.author_name[0]) {
+      // Basic required fields check - be more lenient
+      if (!book.title || !book.author_name?.[0]) {
         continue;
       }
 
-      // Ensure it's actually from 2025
-      if (!book.first_publish_year || book.first_publish_year !== 2025) {
+      const title = book.title.trim();
+      const author = book.author_name[0].trim();
+
+      // Skip if title or author is too short or generic
+      if (title.length < 2 || author.length < 2) {
         continue;
       }
 
-      const isbn = book.isbn[0];
-      const title = book.title;
-      const author = book.author_name[0];
+      // Get ISBN - try multiple sources
+      let isbn = '';
+      if (book.isbn && book.isbn.length > 0) {
+        // Find a valid ISBN (prefer 13-digit, then 10-digit)
+        const validIsbn = book.isbn.find(i => i && (i.length === 13 || i.length === 10));
+        if (validIsbn) {
+          isbn = validIsbn;
+        }
+      }
 
-      // Check if book already exists
+      // If no ISBN, generate a unique identifier for deduplication
+      const bookId = isbn || `${title}_${author}`.toLowerCase().replace(/\s+/g, '_');
+      
+      if (seenIsbns.has(bookId)) {
+        console.log(`Duplicate book skipped: ${title}`);
+        continue;
+      }
+      seenIsbns.add(bookId);
+
+      // Check if book already exists in database
       const { data: existingBook } = await supabase
         .from('books')
         .select('id')
-        .eq('isbn', isbn)
+        .or(`isbn.eq.${isbn},title.eq.${title}`)
         .single();
 
       if (existingBook) {
-        console.log(`Book already exists: ${title}`);
-        continue; // Skip duplicates
+        console.log(`Book already exists in database: ${title}`);
+        continue;
       }
 
-      // Map subjects to our genre categories
-      const genres = mapSubjectsToGenres(book.subject || []);
-      
-      // Generate cover URL
-      const coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+      // Determine publication year
+      let publishYear = 2025;
+      if (book.first_publish_year && book.first_publish_year >= 2020) {
+        publishYear = book.first_publish_year;
+      } else if (book.publish_year && book.publish_year.length > 0) {
+        const recentYear = book.publish_year.find(y => y >= 2020);
+        if (recentYear) publishYear = recentYear;
+      }
 
-      // Create summary from subjects
+      // Map subjects to genres with broader mapping
+      const genres = mapSubjectsToGenres(book.subject || [], title, author);
+      
+      // Generate cover URL - use title/author if no ISBN
+      let coverUrl = '';
+      if (isbn) {
+        coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+      } else {
+        // Try alternative cover sources
+        const titleQuery = encodeURIComponent(title.substring(0, 50));
+        coverUrl = `https://covers.openlibrary.org/b/title/${titleQuery}-L.jpg`;
+      }
+
+      // Create a meaningful summary
       const summary = generateSummary(title, author, genres, book.subject);
 
       // Placeholder critic quotes
@@ -133,17 +190,17 @@ serve(async (req) => {
       const bookData = {
         title,
         author,
-        published_date: '2025-01-01',
+        published_date: `${publishYear}-01-01`,
         genre: genres.length > 0 ? genres : ['Fiction'],
         page_count: book.number_of_pages_median || null,
-        isbn,
+        isbn: isbn || null,
         cover_url: coverUrl,
         summary,
         critic_score: null,
         critic_quotes: criticQuotes
       };
 
-      console.log(`Attempting to insert: ${title} by ${author}`);
+      console.log(`Attempting to insert: "${title}" by ${author} (${publishYear})`);
 
       const { error } = await supabase
         .from('books')
@@ -153,18 +210,18 @@ serve(async (req) => {
         console.error(`Error inserting book "${title}":`, error);
       } else {
         processedCount++;
-        console.log(`✓ Added: ${title} by ${author}`);
+        console.log(`✓ Successfully added: "${title}" by ${author}`);
       }
     }
 
-    console.log(`Successfully processed ${processedCount} new 2025 books`);
+    console.log(`Successfully processed ${processedCount} books`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         processed: processedCount,
         total_found: allBooks.length,
-        message: `Added ${processedCount} new 2025 books to the database`
+        message: `Successfully added ${processedCount} books to the database`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -181,20 +238,24 @@ serve(async (req) => {
   }
 });
 
-function mapSubjectsToGenres(subjects: string[]): string[] {
+function mapSubjectsToGenres(subjects: string[], title: string, author: string): string[] {
   const genreMapping: { [key: string]: string[] } = {
-    'Fantasy': ['fantasy', 'magic', 'dragons', 'wizards', 'supernatural'],
-    'Romance': ['romance', 'love', 'relationships', 'romantic'],
-    'Historical Fiction': ['historical', 'history', 'period', 'historical fiction'],
-    'Thriller': ['thriller', 'suspense', 'mystery', 'crime', 'detective'],
-    'Literary Fiction': ['literary', 'contemporary', 'literature', 'literary fiction'],
-    'Memoir': ['memoir', 'autobiography', 'biography', 'personal narrative'],
-    'Science Fiction': ['science fiction', 'sci-fi', 'space', 'future'],
-    'Mystery': ['mystery', 'detective', 'murder', 'investigation']
+    'Fantasy': ['fantasy', 'magic', 'dragons', 'wizards', 'supernatural', 'epic fantasy'],
+    'Romance': ['romance', 'love', 'relationships', 'romantic', 'love story'],
+    'Historical Fiction': ['historical', 'history', 'period', 'historical fiction', 'civil war', 'world war'],
+    'Thriller': ['thriller', 'suspense', 'mystery', 'crime', 'detective', 'psychological thriller'],
+    'Literary Fiction': ['literary', 'contemporary', 'literature', 'literary fiction', 'drama'],
+    'Memoir': ['memoir', 'autobiography', 'biography', 'personal narrative', 'life story'],
+    'Science Fiction': ['science fiction', 'sci-fi', 'space', 'future', 'dystopian'],
+    'Mystery': ['mystery', 'detective', 'murder', 'investigation', 'police'],
+    'Contemporary Fiction': ['contemporary', 'modern', 'current', 'present day']
   };
 
   const matchedGenres: string[] = [];
+  const titleLower = title.toLowerCase();
+  const authorLower = author.toLowerCase();
   
+  // Check subjects against genre mapping
   for (const [genre, keywords] of Object.entries(genreMapping)) {
     for (const subject of subjects) {
       const subjectLower = subject.toLowerCase();
@@ -206,7 +267,17 @@ function mapSubjectsToGenres(subjects: string[]): string[] {
     }
   }
 
-  return matchedGenres;
+  // Fallback: infer genre from title if no subjects matched
+  if (matchedGenres.length === 0) {
+    for (const [genre, keywords] of Object.entries(genreMapping)) {
+      if (keywords.some(keyword => titleLower.includes(keyword))) {
+        matchedGenres.push(genre);
+        break;
+      }
+    }
+  }
+
+  return matchedGenres.length > 0 ? matchedGenres : ['Fiction'];
 }
 
 function generateSummary(title: string, author: string, genres: string[], subjects?: string[]): string {
@@ -219,7 +290,7 @@ function generateSummary(title: string, author: string, genres: string[], subjec
     summary += ` Exploring themes of ${subjectHints.toLowerCase()}.`;
   }
   
-  summary += ' This 2025 release promises to be an engaging addition to contemporary literature.';
+  summary += ' This recent release promises to be an engaging addition to contemporary literature.';
   
   return summary;
 }
