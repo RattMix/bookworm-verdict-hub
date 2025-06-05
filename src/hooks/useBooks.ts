@@ -27,6 +27,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
 
   const { limit = 16, sortBy = 'newest', genre } = options;
 
@@ -40,7 +41,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         
         let query = supabase
           .from('books')
-          .select('*');
+          .select('*', { count: 'exact' });
 
         // Filter by genre if specified
         if (genre && genre !== 'all') {
@@ -50,7 +51,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         // Apply sorting
         switch (sortBy) {
           case 'critic_score':
-            query = query.order('critic_score', { ascending: false, nullsLast: true });
+            query = query.order('critic_score', { ascending: false });
             break;
           case 'trending':
             query = query.order('created_at', { ascending: false });
@@ -62,7 +63,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         query = query.limit(limit);
 
         console.log('Executing Supabase query...');
-        const { data, error } = await query;
+        const { data, error, count } = await query;
 
         if (error) {
           console.error('Supabase query error:', error);
@@ -71,6 +72,9 @@ export const useBooks = (options: UseBooksOptions = {}) => {
 
         console.log('Raw data from Supabase:', data);
         console.log('Number of books fetched:', data?.length || 0);
+        console.log('Total count from database:', count);
+
+        setTotalCount(count || 0);
 
         // Convert the data to match our Book interface
         const formattedBooks = (data || []).map(book => ({
@@ -92,5 +96,5 @@ export const useBooks = (options: UseBooksOptions = {}) => {
     fetchBooks();
   }, [limit, sortBy, genre]);
 
-  return { books, loading, error };
+  return { books, loading, error, totalCount };
 };

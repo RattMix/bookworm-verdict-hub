@@ -23,7 +23,7 @@ const BrowseBooks = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
 
-  const { books, loading, error } = useBooks({ 
+  const { books, loading, error, totalCount } = useBooks({ 
     limit: 32, 
     sortBy: sortBy as 'newest' | 'critic_score' | 'trending',
     genre: selectedGenre 
@@ -32,6 +32,7 @@ const BrowseBooks = () => {
   console.log('Books data in BrowseBooks:', books);
   console.log('Loading state:', loading);
   console.log('Error state:', error);
+  console.log('Total books in database:', totalCount);
 
   const filteredBooks = books.filter(book => {
     if (!searchQuery) return true;
@@ -120,7 +121,7 @@ const BrowseBooks = () => {
               "Loading books..."
             ) : (
               <>
-                Showing {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
+                Showing {filteredBooks.length} of {totalCount} {totalCount === 1 ? 'book' : 'books'}
                 {selectedGenre !== "all" && ` in ${genres.find(g => g.id === selectedGenre)?.name}`}
               </>
             )}
@@ -143,7 +144,7 @@ const BrowseBooks = () => {
               <BookCard key={book.id} book={book} />
             ))}
           </div>
-        ) : books.length === 0 ? (
+        ) : totalCount === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-600 text-lg">No books available yet.</p>
             <p className="text-gray-500 mb-4">Books will appear here once the ingestion process runs.</p>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Star, TrendingUp, Book, Users, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,11 +49,12 @@ const recentReviews = [
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { books: featuredBooks, loading, error } = useBooks({ limit: 6, sortBy: 'trending' });
+  const { books: featuredBooks, loading, error, totalCount } = useBooks({ limit: 6, sortBy: 'trending' });
 
   console.log('Featured books data:', featuredBooks);
   console.log('Loading state:', loading);
   console.log('Error state:', error);
+  console.log('Total books in database:', totalCount);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -92,7 +92,9 @@ const Index = () => {
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
               <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                <div className="text-3xl font-bold text-slate-100">50,000+</div>
+                <div className="text-3xl font-bold text-slate-100">
+                  {loading ? "..." : totalCount.toLocaleString()}+
+                </div>
                 <div className="text-slate-300 font-medium">Books Reviewed</div>
               </div>
               <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
