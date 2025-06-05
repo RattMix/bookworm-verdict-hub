@@ -25,7 +25,9 @@ const generateCriticReviews = (isbn: string, title: string, author: string, genr
     "Library Journal", "Kirkus Reviews", "NPR Books", "The Washington Post",
     "Los Angeles Times", "Chicago Tribune", "The Atlantic", "Harper's Magazine",
     "The New Yorker", "Entertainment Weekly", "USA Today", "Associated Press",
-    "BookPage", "Shelf Awareness", "Booklist", "The Boston Globe", "Time Magazine"
+    "BookPage", "Shelf Awareness", "Booklist", "The Boston Globe", "Time Magazine",
+    "The Wall Street Journal", "Financial Times", "BBC Culture", "Vogue Books",
+    "Elle Magazine", "GQ Books", "Vanity Fair", "Rolling Stone", "The Observer"
   ];
 
   const critics = [
@@ -34,42 +36,59 @@ const generateCriticReviews = (isbn: string, title: string, author: string, genr
     "Thomas Anderson", "Jennifer Martinez", "Daniel Lee", "Rachel Green",
     "Christopher Brown", "Sophia Davis", "Alexander Thompson", "Olivia White",
     "Benjamin Harris", "Isabella Clark", "Samuel Lewis", "Victoria Hall",
-    "Nicholas Parker", "Grace Taylor", "Matthew Adams", "Caroline Miller"
+    "Nicholas Parker", "Grace Taylor", "Matthew Adams", "Caroline Miller",
+    "Elizabeth Moore", "William Jackson", "Hannah Brown", "Lucas Anderson",
+    "Chloe Wilson", "Ethan Davis", "Ava Martinez", "Mason Taylor"
   ];
 
-  const positiveTemplates = [
-    `A masterful ${genre[0].toLowerCase()} that showcases ${author}'s exceptional storytelling abilities and marks a standout achievement in contemporary literature.`,
-    `${author} delivers a compelling narrative in ${title} that expertly weaves together themes of ${genre[0].toLowerCase()} with remarkable depth and nuance.`,
-    `This ${genre[0].toLowerCase()} triumph proves that ${author} is at the height of their creative powers, offering readers an unforgettable literary experience.`,
-    `${title} is a tour de force that demonstrates ${author}'s unique voice and ability to craft stories that resonate deeply with modern readers.`,
-    `A brilliant exploration of ${genre[0].toLowerCase()} themes that establishes ${author} as one of the most important voices in contemporary fiction.`,
-    `${author}'s latest work is a stunning achievement that combines elegant prose with compelling characters and an engaging plot structure.`,
-    `This remarkable ${genre[0].toLowerCase()} novel showcases ${author}'s ability to create immersive worlds and authentic characters that linger long after reading.`,
-    `${title} represents a bold new direction for ${author}, blending ${genre[0].toLowerCase()} elements with profound insights into the human condition.`,
-    `A captivating ${genre[0].toLowerCase()} work that confirms ${author}'s reputation as a master storyteller capable of both entertaining and enlightening readers.`,
-    `${author} has crafted a ${genre[0].toLowerCase()} masterpiece that balances accessibility with literary sophistication, creating a truly memorable reading experience.`
+  const reviewTemplates = [
+    `A masterful ${genre[0].toLowerCase()} that showcases ${author}'s exceptional storytelling abilities in ${title}.`,
+    `${author} delivers compelling prose in ${title}, weaving together complex themes with remarkable depth.`,
+    `This ${genre[0].toLowerCase()} triumph proves ${author} is at the creative peak with ${title}.`,
+    `${title} represents a bold new direction for ${author}, blending powerful narrative with profound insights.`,
+    `A brilliant exploration of ${genre[0].toLowerCase()} that establishes ${author} as a leading voice in modern literature.`,
+    `${author}'s latest work ${title} combines elegant writing with compelling characters and engaging plot.`,
+    `This remarkable novel showcases ${author}'s ability to create immersive worlds in ${title}.`,
+    `${title} is a tour de force that demonstrates ${author}'s unique literary voice and storytelling mastery.`,
+    `A captivating work that confirms ${author}'s reputation as a masterful storyteller in ${title}.`,
+    `${author} crafts a literary achievement in ${title} that balances accessibility with sophisticated themes.`,
+    `Stunning character development and plot progression make ${title} by ${author} absolutely compelling.`,
+    `${title} showcases ${author}'s remarkable ability to blend ${genre[0].toLowerCase()} with universal human themes.`,
+    `A powerful narrative achievement that positions ${author} among today's most important writers with ${title}.`,
+    `${author} delivers an unforgettable reading experience in ${title} with masterful prose and deep insights.`,
+    `This ${genre[0].toLowerCase()} masterpiece proves ${author}'s continued evolution as a storyteller in ${title}.`
   ];
 
   const reviews: CriticReview[] = [];
   const usedCritics = new Set<string>();
   const usedPublications = new Set<string>();
+  const usedTemplates = new Set<string>();
 
-  for (let i = 0; i < 6; i++) { // Generate 6 reviews per book
-    let critic, publication;
+  // Generate 6-8 reviews per book for variety
+  const reviewCount = Math.floor(Math.random() * 3) + 6; // 6-8 reviews
+
+  for (let i = 0; i < reviewCount; i++) {
+    let critic, publication, template;
     
-    // Ensure unique critics and publications per book
+    // Ensure unique critics per book
     do {
       critic = critics[Math.floor(Math.random() * critics.length)];
     } while (usedCritics.has(critic));
     
+    // Ensure unique publications per book
     do {
       publication = publications[Math.floor(Math.random() * publications.length)];
     } while (usedPublications.has(publication));
 
+    // Ensure unique templates per book
+    do {
+      template = reviewTemplates[Math.floor(Math.random() * reviewTemplates.length)];
+    } while (usedTemplates.has(template));
+
     usedCritics.add(critic);
     usedPublications.add(publication);
+    usedTemplates.add(template);
 
-    const template = positiveTemplates[Math.floor(Math.random() * positiveTemplates.length)];
     const rating = Math.floor(Math.random() * 25) + 75; // 75-100 rating
     const reviewDate = `2025-0${Math.floor(Math.random() * 2) + 1}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`;
 
@@ -150,7 +169,7 @@ serve(async (req) => {
         let validReviews = 0
         for (const review of reviews) {
           try {
-            console.log(`   ✏️ Inserting review from ${review.critic_name}...`)
+            console.log(`   ✏️ Inserting review from ${review.critic_name} (${review.publication})...`)
             
             const { error: insertError } = await supabaseClient
               .from('critic_reviews')
@@ -184,7 +203,7 @@ serve(async (req) => {
         }
 
         // Small delay between books
-        await new Promise(resolve => setTimeout(resolve, 150))
+        await new Promise(resolve => setTimeout(resolve, 100))
 
       } catch (bookErr) {
         console.error(`❌ Error processing book "${book.title}":`, bookErr)

@@ -42,15 +42,21 @@ const BookCard = ({ book }: BookCardProps) => {
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
-  // Enhanced cover image URL generation with multiple fallbacks
+  // Enhanced cover image URL generation with verified ISBN sources
   const getCoverImageUrl = () => {
+    // First try the stored cover_url
+    if (book.cover_url && book.cover_url.trim()) {
+      return book.cover_url;
+    }
+    
+    // Then try ISBN-based sources
     if (book.isbn && book.isbn.trim()) {
       const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
-      // Try Open Library first (most reliable)
+      // Use Open Library as primary source
       return `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
     }
     
-    // Fallback to a more appropriate placeholder
+    // Fallback to thematic placeholder
     return "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop&crop=center";
   };
 
@@ -67,15 +73,16 @@ const BookCard = ({ book }: BookCardProps) => {
             onError={(e) => {
               const target = e.currentTarget;
               // First fallback: try Google Books
-              if (target.src.includes('openlibrary')) {
-                const cleanIsbn = book.isbn?.replace(/[-\s]/g, '');
-                target.src = `https://books.google.com/books/content?id=&printsec=frontcover&img=1&zoom=1&imgtk=${cleanIsbn}`;
+              if (target.src.includes('openlibrary') && book.isbn) {
+                const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
+                target.src = `https://books.google.com/books/content?id=${cleanIsbn}&printsec=frontcover&img=1&zoom=1`;
               } 
-              // Second fallback: generic book placeholder
-              else if (target.src.includes('google')) {
-                target.src = "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop&crop=center";
+              // Second fallback: try alternative Open Library format
+              else if (target.src.includes('google') && book.isbn) {
+                const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
+                target.src = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-M.jpg`;
               }
-              // Final fallback: simple book image
+              // Final fallback: thematic book image
               else {
                 target.src = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
               }
@@ -138,7 +145,7 @@ const BookCard = ({ book }: BookCardProps) => {
 
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-500">
-              {book.isbn ? 'Cover available' : 'Cover coming soon'}
+              {book.isbn ? `ISBN: ${book.isbn}` : 'ISBN pending'}
             </span>
             <span className="text-slate-600 font-medium hover:text-slate-800 cursor-pointer">
               Read More →
