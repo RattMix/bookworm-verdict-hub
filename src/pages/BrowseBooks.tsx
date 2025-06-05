@@ -51,7 +51,7 @@ const sampleBooks = [
 
 const BrowseBooks = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortBy, setSortBy] = useState("trending");
 
   return (
@@ -90,7 +90,7 @@ const BrowseBooks = () => {
                 <SelectValue placeholder="All Genres" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Genres</SelectItem>
+                <SelectItem value="all">All Genres</SelectItem>
                 {genres.map((genre) => (
                   <SelectItem key={genre.id} value={genre.id}>
                     {genre.name}
