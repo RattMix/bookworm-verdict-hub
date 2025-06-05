@@ -37,48 +37,19 @@ const BookCard = ({ book }: BookCardProps) => {
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
-  // Build cover image URL from ISBN with fallback
+  // Build cover image URL from ISBN
   const getCoverImageUrl = () => {
-    console.log(`Getting cover for "${book.title}" - ISBN: ${book.isbn}, stored cover_url: ${book.cover_url}`);
+    console.log(`Getting cover for "${book.title}" - ISBN: ${book.isbn}`);
     
-    // First try: Use ISBN to build Open Library URL
     if (book.isbn && book.isbn.trim()) {
-      const cleanIsbn = book.isbn.replace(/[-\s]/g, ''); // Clean ISBN
+      const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
       const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-L.jpg`;
       console.log(`Built Open Library URL: ${openLibraryUrl}`);
       return openLibraryUrl;
     }
     
-    // Second try: Use stored cover_url if available
-    if (book.cover_url && book.cover_url.trim()) {
-      console.log(`Using stored cover URL: ${book.cover_url}`);
-      return book.cover_url;
-    }
-    
-    // Fallback: Use placeholder
-    console.log(`No cover available for "${book.title}", using placeholder`);
-    return "/placeholder.svg";
-  };
-
-  // Handle cover image error with fallback chain
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.currentTarget;
-    const currentSrc = target.src;
-    
-    console.log(`Image failed to load: ${currentSrc} for book "${book.title}"`);
-    
-    // If Open Library image failed and we have a stored cover_url, try that
-    if (currentSrc.includes('covers.openlibrary.org') && book.cover_url && book.cover_url.trim()) {
-      console.log(`Trying stored cover URL as fallback: ${book.cover_url}`);
-      target.src = book.cover_url;
-      return;
-    }
-    
-    // Final fallback to placeholder
-    if (!currentSrc.includes('/placeholder.svg')) {
-      console.log(`Using final placeholder fallback for "${book.title}"`);
-      target.src = "/placeholder.svg";
-    }
+    console.log(`No ISBN available for "${book.title}", using placeholder`);
+    return "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
   };
 
   const coverImageUrl = getCoverImageUrl();
@@ -91,8 +62,12 @@ const BookCard = ({ book }: BookCardProps) => {
             src={coverImageUrl}
             alt={`Cover of ${book.title}`}
             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={handleImageError}
             onLoad={() => console.log(`Successfully loaded cover for "${book.title}": ${coverImageUrl}`)}
+            onError={(e) => {
+              console.log(`Cover failed to load for "${book.title}", using fallback`);
+              const target = e.currentTarget;
+              target.src = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
+            }}
             loading="lazy"
           />
           <div className="absolute top-3 right-3">

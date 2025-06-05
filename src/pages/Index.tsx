@@ -7,8 +7,6 @@ import BookCard from "@/components/BookCard";
 import ReviewCard from "@/components/ReviewCard";
 import Navigation from "@/components/Navigation";
 import { useBooks } from "@/hooks/useBooks";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 // Real critic reviews from actual publications - no fake user reviews
 const recentReviews = [
@@ -52,46 +50,12 @@ const recentReviews = [
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isIngesting, setIsIngesting] = useState(false);
   const { books: featuredBooks, loading, error, totalCount } = useBooks({ limit: 6, sortBy: 'trending' });
-  const { toast } = useToast();
-
-  // Auto-trigger ingestion to refresh with ISBN data
-  useEffect(() => {
-    const autoIngest = async () => {
-      // Always trigger ingestion to get books with ISBNs
-      if (!loading && !error && !isIngesting) {
-        console.log('Triggering ingestion to get books with ISBNs...');
-        setIsIngesting(true);
-        
-        try {
-          const { data, error: ingestError } = await supabase.functions.invoke('ingest-books');
-          
-          if (ingestError) {
-            console.error('Auto-ingestion error:', ingestError);
-          } else {
-            console.log('Auto-ingestion completed:', data);
-            // Refresh the page after successful ingestion
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
-          }
-        } catch (error) {
-          console.error('Auto-ingestion failed:', error);
-        }
-        
-        setIsIngesting(false);
-      }
-    };
-
-    autoIngest();
-  }, [loading, error, isIngesting]);
 
   console.log('Featured books data:', featuredBooks);
   console.log('Loading state:', loading);
   console.log('Error state:', error);
   console.log('Total books in database:', totalCount);
-  console.log('Is ingesting:', isIngesting);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -130,7 +94,7 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
               <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
                 <div className="text-3xl font-bold text-slate-100">
-                  {loading || isIngesting ? "..." : totalCount > 0 ? totalCount.toLocaleString() : "Growing"}+
+                  {loading ? "..." : totalCount > 0 ? totalCount.toLocaleString() : "Growing"}+
                 </div>
                 <div className="text-slate-300 font-medium">Books Reviewed</div>
               </div>
@@ -187,11 +151,9 @@ const Index = () => {
             </div>
           )}
           
-          {(loading || isIngesting) ? (
+          {loading ? (
             <div className="text-center py-8">
-              <p className="text-gray-600">
-                {isIngesting ? "Adding books with cover images..." : "Loading latest books..."}
-              </p>
+              <p className="text-gray-600">Loading latest books...</p>
             </div>
           ) : featuredBooks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -201,8 +163,8 @@ const Index = () => {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600">Loading books with cover images...</p>
-              <p className="text-gray-500 text-sm mt-2">This may take a moment while we set up the collection.</p>
+              <p className="text-gray-600">No books available yet.</p>
+              <p className="text-gray-500 text-sm mt-2">New books are being added regularly. Check back soon for the latest releases.</p>
             </div>
           )}
         </div>

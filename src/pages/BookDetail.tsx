@@ -7,7 +7,6 @@ import Navigation from "@/components/Navigation";
 const bookData = {
   title: "Tomorrow, and Tomorrow, and Tomorrow",
   author: "Gabrielle Zevin",
-  coverUrl: "https://covers.openlibrary.org/b/isbn/9780593321201-L.jpg",
   isbn: "9780593321201",
   genre: ["Literary Fiction", "Contemporary"],
   publishYear: 2022,
@@ -58,15 +57,7 @@ const BookDetail = () => {
       console.log(`Book detail cover URL: ${openLibraryUrl}`);
       return openLibraryUrl;
     }
-    return bookData.coverUrl || "/placeholder.svg";
-  };
-
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.currentTarget;
-    console.log(`Book detail image failed: ${target.src}`);
-    if (!target.src.includes('/placeholder.svg')) {
-      target.src = "/placeholder.svg";
-    }
+    return "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
   };
 
   return (
@@ -82,7 +73,10 @@ const BookDetail = () => {
                 src={getCoverImageUrl()} 
                 alt={bookData.title}
                 className="w-full h-96 object-cover rounded-lg mb-6"
-                onError={handleImageError}
+                onError={(e) => {
+                  console.log(`Book detail image failed: ${e.currentTarget.src}`);
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
+                }}
                 onLoad={() => console.log(`Book detail cover loaded: ${getCoverImageUrl()}`)}
               />
               
