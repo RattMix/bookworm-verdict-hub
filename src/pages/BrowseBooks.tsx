@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import BookCard from "@/components/BookCard";
+import { useBooks } from "@/hooks/useBooks";
 
 const genres = [
   { id: "literary-fiction", name: "Literary Fiction", description: "Contemporary and classic works that explore the human experience through sophisticated prose." },
@@ -17,120 +18,26 @@ const genres = [
   { id: "dystopian", name: "Dystopian Fiction", description: "Speculative works exploring oppressive future societies." }
 ];
 
-const allBooks = [
-  {
-    id: "1",
-    title: "The Seven Moons of Maali Almeida",
-    author: "Shehan Karunatilaka",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9781635574968-L.jpg",
-    criticScore: 89,
-    userScore: 8.4,
-    reviewCount: 1847,
-    genre: "Literary Fiction",
-    year: 2022,
-    pages: 416
-  },
-  {
-    id: "2", 
-    title: "Tomorrow, and Tomorrow, and Tomorrow",
-    author: "Gabrielle Zevin",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780593321201-L.jpg",
-    criticScore: 86,
-    userScore: 8.7,
-    reviewCount: 2923,
-    genre: "Literary Fiction",
-    year: 2022,
-    pages: 416
-  },
-  {
-    id: "3",
-    title: "The School for Good Mothers",
-    author: "Jessamine Chan",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9781501177736-L.jpg",
-    criticScore: 78,
-    userScore: 7.9,
-    reviewCount: 1623,
-    genre: "Dystopian Fiction",
-    year: 2022,
-    pages: 336
-  },
-  {
-    id: "4",
-    title: "Babel",
-    author: "R.F. Kuang",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780063021426-L.jpg",
-    criticScore: 81,
-    userScore: 8.9,
-    reviewCount: 3241,
-    genre: "Fantasy",
-    year: 2022,
-    pages: 560
-  },
-  {
-    id: "5",
-    title: "The Atlas Six",
-    author: "Olivie Blake",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9781250854445-L.jpg",
-    criticScore: 72,
-    userScore: 8.1,
-    reviewCount: 2156,
-    genre: "Fantasy",
-    year: 2022,
-    pages: 464
-  },
-  {
-    id: "6",
-    title: "The Thursday Murder Club",
-    author: "Richard Osman",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780241988268-L.jpg",
-    criticScore: 75,
-    userScore: 8.3,
-    reviewCount: 3847,
-    genre: "Mystery",
-    year: 2020,
-    pages: 368
-  },
-  {
-    id: "7",
-    title: "Klara and the Sun",
-    author: "Kazuo Ishiguro",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780571364886-L.jpg",
-    criticScore: 84,
-    userScore: 7.8,
-    reviewCount: 2456,
-    genre: "Science Fiction",
-    year: 2021,
-    pages: 320
-  },
-  {
-    id: "8",
-    title: "The Invisible Bridge",
-    author: "Julie Orringer",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780375414596-L.jpg",
-    criticScore: 87,
-    userScore: 8.5,
-    reviewCount: 1987,
-    genre: "Historical Fiction",
-    year: 2010,
-    pages: 624
-  }
-];
-
 const BrowseBooks = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("all");
-  const [sortBy, setSortBy] = useState("trending");
+  const [sortBy, setSortBy] = useState("newest");
 
-  const filteredBooks = allBooks.filter(book => {
-    const matchesSearch = searchQuery === "" || 
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.genre.toLowerCase().includes(searchQuery.toLowerCase());
+  const { books, loading, error } = useBooks({ 
+    limit: 32, 
+    sortBy: sortBy as 'newest' | 'critic_score' | 'trending',
+    genre: selectedGenre 
+  });
+
+  const filteredBooks = books.filter(book => {
+    if (!searchQuery) return true;
     
-    const matchesGenre = selectedGenre === "all" || 
-      book.genre.toLowerCase().includes(selectedGenre.replace("-", " "));
-    
-    return matchesSearch && matchesGenre;
+    const query = searchQuery.toLowerCase();
+    return (
+      book.title.toLowerCase().includes(query) ||
+      book.author.toLowerCase().includes(query) ||
+      book.genre?.some(g => g.toLowerCase().includes(query))
+    );
   });
 
   return (
@@ -184,11 +91,9 @@ const BrowseBooks = () => {
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="trending">Trending</SelectItem>
-                <SelectItem value="critic-score">Highest Critic Score</SelectItem>
-                <SelectItem value="reader-score">Highest Reader Score</SelectItem>
-                <SelectItem value="most-reviewed">Most Reviewed</SelectItem>
                 <SelectItem value="newest">Newest Releases</SelectItem>
+                <SelectItem value="critic_score">Highest Critic Score</SelectItem>
+                <SelectItem value="trending">Trending</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -197,18 +102,36 @@ const BrowseBooks = () => {
         {/* Results */}
         <div className="mb-8">
           <p className="text-gray-600">
-            Showing {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
-            {selectedGenre !== "all" && ` in ${genres.find(g => g.id === selectedGenre)?.name}`}
+            {loading ? (
+              "Loading books..."
+            ) : (
+              <>
+                Showing {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
+                {selectedGenre !== "all" && ` in ${genres.find(g => g.id === selectedGenre)?.name}`}
+              </>
+            )}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredBooks.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
-        </div>
+        {error && (
+          <div className="text-center py-8">
+            <p className="text-red-600">Error loading books: {error}</p>
+          </div>
+        )}
 
-        {filteredBooks.length === 0 && (
+        {loading ? (
+          <div className="text-center py-16">
+            <p className="text-gray-600 text-lg">Loading books...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {filteredBooks.map((book) => (
+              <BookCard key={book.id} book={book} />
+            ))}
+          </div>
+        )}
+
+        {!loading && filteredBooks.length === 0 && (
           <div className="text-center py-16">
             <p className="text-gray-600 text-lg">No books found matching your criteria.</p>
             <Button 

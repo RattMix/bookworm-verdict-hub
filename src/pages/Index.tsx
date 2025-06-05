@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Star, TrendingUp, Book, Users, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -5,65 +6,7 @@ import { Input } from "@/components/ui/input";
 import BookCard from "@/components/BookCard";
 import ReviewCard from "@/components/ReviewCard";
 import Navigation from "@/components/Navigation";
-
-// Expanded featured books with real titles - removed fake userScore
-const featuredBooks = [
-  {
-    id: "1",
-    title: "The Seven Moons of Maali Almeida",
-    author: "Shehan Karunatilaka",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9781635574968-L.jpg",
-    criticScore: 89,
-    reviewCount: 1847,
-    genre: "Literary Fiction",
-    year: 2022,
-    pages: 416
-  },
-  {
-    id: "2", 
-    title: "Tomorrow, and Tomorrow, and Tomorrow",
-    author: "Gabrielle Zevin",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780593321201-L.jpg",
-    criticScore: 86,
-    reviewCount: 2923,
-    genre: "Literary Fiction",
-    year: 2022,
-    pages: 416
-  },
-  {
-    id: "3",
-    title: "The School for Good Mothers",
-    author: "Jessamine Chan",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9781501177736-L.jpg",
-    criticScore: 78,
-    reviewCount: 1623,
-    genre: "Dystopian Fiction",
-    year: 2022,
-    pages: 336
-  },
-  {
-    id: "4",
-    title: "Babel",
-    author: "R.F. Kuang",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780063021426-L.jpg",
-    criticScore: 81,
-    reviewCount: 3241,
-    genre: "Fantasy",
-    year: 2022,
-    pages: 560
-  },
-  {
-    id: "5",
-    title: "The Atlas Six",
-    author: "Olivie Blake",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9781250854445-L.jpg",
-    criticScore: 72,
-    reviewCount: 2156,
-    genre: "Fantasy",
-    year: 2022,
-    pages: 464
-  }
-];
+import { useBooks } from "@/hooks/useBooks";
 
 // Real critic reviews from actual publications - no fake user reviews
 const recentReviews = [
@@ -107,6 +50,7 @@ const recentReviews = [
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { books: featuredBooks, loading } = useBooks({ limit: 6, sortBy: 'trending' });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -180,11 +124,17 @@ const Index = () => {
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredBooks.slice(0, 3).map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Loading latest books...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredBooks.slice(0, 3).map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
