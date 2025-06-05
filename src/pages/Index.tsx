@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Star, TrendingUp, Book, Users, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -49,12 +50,44 @@ const recentReviews = [
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isIngesting, setIsIngesting] = useState(false);
   const { books: featuredBooks, loading, error, totalCount } = useBooks({ limit: 6, sortBy: 'trending' });
 
   console.log('Featured books data:', featuredBooks);
   console.log('Loading state:', loading);
   console.log('Error state:', error);
   console.log('Total books in database:', totalCount);
+
+  const handleIngestion = async () => {
+    setIsIngesting(true);
+    try {
+      console.log('Triggering book ingestion...');
+      const response = await fetch(`https://vzbdtxwiuwuxohrdzuza.supabase.co/functions/v1/ingest-books`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6YmR0eHdpdXd1eG9ocmR6dXphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkxMzQyMzAsImV4cCI6MjA2NDcxMDIzMH0.j4CPhAmggkN7039qztpdt8Q6OhWWZEGs-JcJXwMML9k`
+        },
+        body: JSON.stringify({})
+      });
+
+      const result = await response.json();
+      console.log('Ingestion result:', result);
+      
+      if (result.success) {
+        alert(`Successfully ingested ${result.processed} books!`);
+        // Refresh the page to show new books
+        window.location.reload();
+      } else {
+        alert('Ingestion failed: ' + (result.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error triggering ingestion:', error);
+      alert('Error triggering ingestion: ' + error.message);
+    } finally {
+      setIsIngesting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -164,11 +197,12 @@ const Index = () => {
             <div className="text-center py-8">
               <p className="text-gray-600">No books available yet. Books will appear here once ingested.</p>
               <Button 
-                onClick={() => console.log('Trigger ingestion')} 
+                onClick={handleIngestion}
+                disabled={isIngesting}
                 className="mt-4"
                 variant="outline"
               >
-                Refresh Books
+                {isIngesting ? 'Ingesting Books...' : 'Ingest Books from Open Library'}
               </Button>
             </div>
           )}
