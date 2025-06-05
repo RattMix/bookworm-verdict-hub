@@ -161,7 +161,9 @@ const Index = () => {
       </section>
 
       {/* Ad Slot - Leaderboard */}
-      <div className="ad-slot-leaderboard py-4 bg-gray-100"></div>
+      <div className="ad-slot-leaderboard" style={{minHeight: '90px', background: '#eee', margin: '2rem 0', textAlign: 'center', fontSize: '14px', padding: '1rem', border: '1px solid #ccc'}}>
+        [Ad Slot: Leaderboard]
+      </div>
 
       {/* Featured Books */}
       <section className="py-20">

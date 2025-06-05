@@ -107,7 +107,9 @@ const BookDetail = () => {
             </div>
 
             {/* Ad Slot - Sidebar */}
-            <div className="ad-slot-sidebar mt-6 bg-gray-100 h-64 border border-slate-200 rounded-xl"></div>
+            <div className="ad-slot-sidebar" style={{minHeight: '600px', width: '100%', background: '#f5f5f5', marginTop: '2rem', textAlign: 'center', padding: '1rem', border: '1px solid #ddd', borderRadius: '12px'}}>
+              [Ad Slot: Sidebar]
+            </div>
           </div>
           
           {/* Main Content */}
@@ -156,7 +158,9 @@ const BookDetail = () => {
             </div>
 
             {/* Ad Slot - Inline */}
-            <div className="ad-slot-inline bg-gray-100 h-32 border border-slate-200 rounded-xl"></div>
+            <div className="ad-slot-inline" style={{minHeight: '250px', background: '#fafafa', margin: '2rem 0', textAlign: 'center', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px'}}>
+              [Ad Slot: Inline]
+            </div>
             
             {/* Professional Reviews */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
