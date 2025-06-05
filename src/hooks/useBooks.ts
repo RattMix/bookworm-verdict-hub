@@ -13,7 +13,7 @@ interface Book {
   cover_url: string | null;
   summary: string | null;
   critic_score: number | null;
-  critic_quotes: any; // Changed from any[] to any to match Supabase Json type
+  critic_quotes: any;
   created_at: string;
 }
 
@@ -34,6 +34,10 @@ export const useBooks = (options: UseBooksOptions = {}) => {
     const fetchBooks = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
+        console.log('Fetching books with options:', { limit, sortBy, genre });
+        
         let query = supabase
           .from('books')
           .select('*');
@@ -46,7 +50,7 @@ export const useBooks = (options: UseBooksOptions = {}) => {
         // Apply sorting
         switch (sortBy) {
           case 'critic_score':
-            query = query.order('critic_score', { ascending: false });
+            query = query.order('critic_score', { ascending: false, nullsLast: true });
             break;
           case 'trending':
             query = query.order('created_at', { ascending: false });
@@ -57,9 +61,16 @@ export const useBooks = (options: UseBooksOptions = {}) => {
 
         query = query.limit(limit);
 
+        console.log('Executing Supabase query...');
         const { data, error } = await query;
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase query error:', error);
+          throw error;
+        }
+
+        console.log('Raw data from Supabase:', data);
+        console.log('Number of books fetched:', data?.length || 0);
 
         // Convert the data to match our Book interface
         const formattedBooks = (data || []).map(book => ({
@@ -67,9 +78,12 @@ export const useBooks = (options: UseBooksOptions = {}) => {
           critic_quotes: Array.isArray(book.critic_quotes) ? book.critic_quotes : []
         }));
 
+        console.log('Formatted books:', formattedBooks);
         setBooks(formattedBooks);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch books');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch books';
+        console.error('Error in fetchBooks:', errorMessage);
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

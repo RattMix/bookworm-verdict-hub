@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Filter, SortDesc } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,12 +10,12 @@ import BookCard from "@/components/BookCard";
 import { useBooks } from "@/hooks/useBooks";
 
 const genres = [
-  { id: "literary-fiction", name: "Literary Fiction", description: "Contemporary and classic works that explore the human experience through sophisticated prose." },
-  { id: "mystery-thriller", name: "Mystery & Thriller", description: "Crime fiction, psychological thrillers, and suspenseful narratives." },
-  { id: "sci-fi-fantasy", name: "Science Fiction & Fantasy", description: "Speculative fiction exploring imagined worlds and future possibilities." },
-  { id: "historical-fiction", name: "Historical Fiction", description: "Stories set in the past, bringing historical periods to life through fiction." },
-  { id: "memoir-biography", name: "Memoir & Biography", description: "Personal narratives and life stories of notable figures." },
-  { id: "dystopian", name: "Dystopian Fiction", description: "Speculative works exploring oppressive future societies." }
+  { id: "Fantasy", name: "Fantasy", description: "Speculative fiction exploring magical and supernatural worlds." },
+  { id: "Romance", name: "Romance", description: "Stories focused on love, relationships, and romantic connections." },
+  { id: "Historical Fiction", name: "Historical Fiction", description: "Stories set in the past, bringing historical periods to life through fiction." },
+  { id: "Thriller", name: "Thriller", description: "Crime fiction, psychological thrillers, and suspenseful narratives." },
+  { id: "Literary Fiction", name: "Literary Fiction", description: "Contemporary and classic works that explore the human experience through sophisticated prose." },
+  { id: "Memoir", name: "Memoir & Biography", description: "Personal narratives and life stories of notable figures." }
 ];
 
 const BrowseBooks = () => {
@@ -27,6 +28,10 @@ const BrowseBooks = () => {
     sortBy: sortBy as 'newest' | 'critic_score' | 'trending',
     genre: selectedGenre 
   });
+
+  console.log('Books data in BrowseBooks:', books);
+  console.log('Loading state:', loading);
+  console.log('Error state:', error);
 
   const filteredBooks = books.filter(book => {
     if (!searchQuery) return true;
@@ -55,14 +60,12 @@ const BrowseBooks = () => {
 
         {/* Catalogue Explainer */}
         <div className="max-w-4xl mx-auto mb-8">
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-slate-800 mb-3">Why only 2025 books?</h3>
-            <p className="text-slate-700 leading-relaxed">
-              Our goal is to build the most trusted, independent book review aggregator — with millions of titles across all genres. 
-              To keep things fast and focused while we scale, we're currently prioritising books published in <strong>2025</strong> across key genres. 
-              More books (and more years!) are coming soon.
-            </p>
-          </div>
+          <h3 className="text-lg font-semibold text-slate-800 mb-3">Why only 2025 books?</h3>
+          <p className="text-slate-700 leading-relaxed">
+            Our goal is to build the most trusted, independent book review aggregator — with millions of titles across all genres. 
+            To keep things fast and focused while we scale, we're currently prioritising books published in <strong>2025</strong> across key genres. 
+            More books (and more years!) are coming soon.
+          </p>
         </div>
 
         {/* Search and Filters */}
@@ -134,15 +137,24 @@ const BrowseBooks = () => {
           <div className="text-center py-16">
             <p className="text-gray-600 text-lg">Loading books...</p>
           </div>
-        ) : (
+        ) : filteredBooks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredBooks.map((book) => (
               <BookCard key={book.id} book={book} />
             ))}
           </div>
-        )}
-
-        {!loading && filteredBooks.length === 0 && (
+        ) : books.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-gray-600 text-lg">No books available yet.</p>
+            <p className="text-gray-500 mb-4">Books will appear here once the ingestion process runs.</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              variant="outline"
+            >
+              Refresh Page
+            </Button>
+          </div>
+        ) : (
           <div className="text-center py-16">
             <p className="text-gray-600 text-lg">No books found matching your criteria.</p>
             <Button 

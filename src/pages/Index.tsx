@@ -50,7 +50,11 @@ const recentReviews = [
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { books: featuredBooks, loading } = useBooks({ limit: 6, sortBy: 'trending' });
+  const { books: featuredBooks, loading, error } = useBooks({ limit: 6, sortBy: 'trending' });
+
+  console.log('Featured books data:', featuredBooks);
+  console.log('Loading state:', loading);
+  console.log('Error state:', error);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -113,14 +117,12 @@ const Index = () => {
       <section className="py-12 bg-white border-y border-slate-200">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Why only 2025 books?</h3>
-              <p className="text-slate-700 leading-relaxed">
-                Our goal is to build the most trusted, independent book review aggregator — with millions of titles across all genres. 
-                To keep things fast and focused while we scale, we're currently prioritising books published in <strong>2025</strong> across key genres. 
-                More books (and more years!) are coming soon.
-              </p>
-            </div>
+            <h3 className="text-lg font-semibold text-slate-800 mb-3">Why only 2025 books?</h3>
+            <p className="text-slate-700 leading-relaxed">
+              Our goal is to build the most trusted, independent book review aggregator — with millions of titles across all genres. 
+              To keep things fast and focused while we scale, we're currently prioritising books published in <strong>2025</strong> across key genres. 
+              More books (and more years!) are coming soon.
+            </p>
           </div>
         </div>
       </section>
@@ -140,15 +142,32 @@ const Index = () => {
             </Button>
           </div>
           
+          {error && (
+            <div className="text-center py-8">
+              <p className="text-red-600">Error loading books: {error}</p>
+            </div>
+          )}
+          
           {loading ? (
             <div className="text-center py-8">
               <p className="text-gray-600">Loading latest books...</p>
             </div>
-          ) : (
+          ) : featuredBooks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredBooks.slice(0, 3).map((book) => (
                 <BookCard key={book.id} book={book} />
               ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-600">No books available yet. Books will appear here once ingested.</p>
+              <Button 
+                onClick={() => console.log('Trigger ingestion')} 
+                className="mt-4"
+                variant="outline"
+              >
+                Refresh Books
+              </Button>
             </div>
           )}
         </div>

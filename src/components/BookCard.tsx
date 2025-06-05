@@ -1,3 +1,4 @@
+
 import { Star, Users, Award } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -92,7 +93,7 @@ const BookCard = ({ book }: BookCardProps) => {
 
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-500">
-              {reviewCount > 0 ? `${reviewCount} critic reviews` : 'Reviews coming soon'}
+              Critic reviews coming soon
             </span>
             <span className="text-slate-600 font-medium hover:text-slate-800 cursor-pointer">
               Read More →
