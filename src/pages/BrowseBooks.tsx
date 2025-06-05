@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import BookCard from "@/components/BookCard";
 import { useBooks } from "@/hooks/useBooks";
+import { supabase } from "@/integrations/supabase/client";
 
 const genres = [
   { id: "Fantasy", name: "Fantasy", description: "Speculative fiction exploring magical and supernatural worlds." },
@@ -24,7 +25,7 @@ const BrowseBooks = () => {
   const [sortBy, setSortBy] = useState("newest");
 
   const { books, loading, error, totalCount } = useBooks({ 
-    limit: 32, 
+    limit: 64, 
     sortBy: sortBy as 'newest' | 'critic_score' | 'trending',
     genre: selectedGenre 
   });
@@ -45,6 +46,48 @@ const BrowseBooks = () => {
     );
   });
 
+  // Improved function to trigger the book ingestion
+  const handleIngestBooks = async () => {
+    try {
+      console.log('🚀 Starting book ingestion...');
+      const { data, error } = await supabase.functions.invoke('ingest-books');
+
+      if (error) {
+        console.error('❌ Book ingestion error:', error.message || error);
+        alert('Error ingesting books. Please try again.');
+        return;
+      }
+
+      console.log('✅ Book ingestion result:', data);
+      alert(`Successfully added ${data.booksAdded} new books!`);
+      window.location.reload();
+    } catch (err) {
+      console.error('❌ Failed to call book ingestion function:', err);
+      alert('Unexpected error during book ingestion.');
+    }
+  };
+
+  // Improved function to trigger the critic review ingestion
+  const handleIngestReviews = async () => {
+    try {
+      console.log('🚀 Starting critic review ingestion...');
+      const { data, error } = await supabase.functions.invoke('ingest-critic-reviews');
+
+      if (error) {
+        console.error('❌ Review ingestion error:', error.message || error);
+        alert('Error ingesting critic reviews. Please try again.');
+        return;
+      }
+
+      console.log('✅ Review ingestion result:', data);
+      alert(`Successfully added ${data.reviewsAdded} critic reviews!`);
+      window.location.reload();
+    } catch (err) {
+      console.error('❌ Failed to call review ingestion function:', err);
+      alert('Unexpected error during review ingestion.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
       <Navigation />
@@ -57,6 +100,16 @@ const BrowseBooks = () => {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Explore our collection of reviewed titles across all genres
           </p>
+        </div>
+
+        {/* Debug buttons - remove after setup */}
+        <div className="mb-8 flex gap-4 justify-center">
+          <Button onClick={handleIngestBooks} variant="outline" className="bg-blue-50">
+            Load 50 Books (Debug)
+          </Button>
+          <Button onClick={handleIngestReviews} variant="outline" className="bg-green-50">
+            Load Critic Reviews (Debug)
+          </Button>
         </div>
 
         {/* Catalogue Explainer */}
@@ -150,7 +203,7 @@ const BrowseBooks = () => {
         ) : totalCount === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-600 text-lg">Our collection is growing!</p>
-            <p className="text-gray-500 mb-4">New books are being added regularly. Check back soon for the latest releases.</p>
+            <p className="text-gray-500 mb-4">Use the debug buttons above to load the initial book collection.</p>
           </div>
         ) : sortBy === 'trending' && books.length === 0 ? (
           <div className="text-center py-16">

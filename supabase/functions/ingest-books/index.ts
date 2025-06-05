@@ -18,9 +18,9 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Starting book ingestion for 2025 books...')
+    console.log('Starting comprehensive book ingestion for 50 popular books...')
 
-    // Popular 2025 books with their actual ISBNs for testing
+    // 50 popular books with their actual ISBNs
     const targetBooks = [
       { title: "Iron Flame", author: "Rebecca Yarros", isbn: "9781649374172", genre: ["Fantasy", "Romance"] },
       { title: "Tomorrow, and Tomorrow, and Tomorrow", author: "Gabrielle Zevin", isbn: "9780593321201", genre: ["Literary Fiction"] },
@@ -46,7 +46,32 @@ serve(async (req) => {
       { title: "Red, White & Royal Blue", author: "Casey McQuiston", isbn: "9781250316776", genre: ["Romance", "LGBTQ+"] },
       { title: "The Priory of the Orange Tree", author: "Samantha Shannon", isbn: "9781635570304", genre: ["Fantasy", "Epic Fantasy"] },
       { title: "The Poppy War", author: "R.F. Kuang", isbn: "9780062662569", genre: ["Fantasy", "Military Fantasy"] },
-      { title: "Educated", author: "Tara Westover", isbn: "9780399590504", genre: ["Memoir", "Biography"] }
+      { title: "Educated", author: "Tara Westover", isbn: "9780399590504", genre: ["Memoir", "Biography"] },
+      { title: "Little Fires Everywhere", author: "Celeste Ng", isbn: "9780735224292", genre: ["Literary Fiction", "Contemporary"] },
+      { title: "The Handmaid's Tale", author: "Margaret Atwood", isbn: "9780525435006", genre: ["Dystopian", "Literary Fiction"] },
+      { title: "Big Little Lies", author: "Liane Moriarty", isbn: "9780399167065", genre: ["Mystery", "Contemporary"] },
+      { title: "Gone Girl", author: "Gillian Flynn", isbn: "9780307588364", genre: ["Thriller", "Mystery"] },
+      { title: "The Girl on the Train", author: "Paula Hawkins", isbn: "9781594634024", genre: ["Thriller", "Mystery"] },
+      { title: "It Ends with Us", author: "Colleen Hoover", isbn: "9781501110368", genre: ["Romance", "Contemporary"] },
+      { title: "Verity", author: "Colleen Hoover", isbn: "9781538724736", genre: ["Thriller", "Romance"] },
+      { title: "The Guest List", author: "Lucy Foley", isbn: "9780062868930", genre: ["Thriller", "Mystery"] },
+      { title: "The Thursday Murder Club", author: "Richard Osman", isbn: "9781984880567", genre: ["Mystery", "Cozy Mystery"] },
+      { title: "The Sanatorium", author: "Sarah Pearse", isbn: "9780593296677", genre: ["Thriller", "Mystery"] },
+      { title: "The Midnight Girls", author: "Alicia Jasinska", isbn: "9781250624239", genre: ["Fantasy", "Young Adult"] },
+      { title: "Project Hail Mary", author: "Andy Weir", isbn: "9780593135204", genre: ["Science Fiction", "Thriller"] },
+      { title: "The Martian", author: "Andy Weir", isbn: "9780553418026", genre: ["Science Fiction", "Thriller"] },
+      { title: "Ready Player One", author: "Ernest Cline", isbn: "9780307887436", genre: ["Science Fiction", "Adventure"] },
+      { title: "The Hunger Games", author: "Suzanne Collins", isbn: "9780439023481", genre: ["Young Adult", "Dystopian"] },
+      { title: "Harry Potter and the Sorcerer's Stone", author: "J.K. Rowling", isbn: "9780439708180", genre: ["Fantasy", "Young Adult"] },
+      { title: "The Lord of the Rings", author: "J.R.R. Tolkien", isbn: "9780544003415", genre: ["Fantasy", "Epic Fantasy"] },
+      { title: "1984", author: "George Orwell", isbn: "9780452284234", genre: ["Dystopian", "Classic"] },
+      { title: "To Kill a Mockingbird", author: "Harper Lee", isbn: "9780061120084", genre: ["Classic", "Literary Fiction"] },
+      { title: "Pride and Prejudice", author: "Jane Austen", isbn: "9780141439518", genre: ["Classic", "Romance"] },
+      { title: "The Great Gatsby", author: "F. Scott Fitzgerald", isbn: "9780743273565", genre: ["Classic", "Literary Fiction"] },
+      { title: "Dune", author: "Frank Herbert", isbn: "9780441172719", genre: ["Science Fiction", "Epic"] },
+      { title: "The Catcher in the Rye", author: "J.D. Salinger", isbn: "9780316769174", genre: ["Classic", "Literary Fiction"] },
+      { title: "Brave New World", author: "Aldous Huxley", isbn: "9780060850524", genre: ["Dystopian", "Science Fiction"] },
+      { title: "Animal Farm", author: "George Orwell", isbn: "9780452284240", genre: ["Classic", "Political Satire"] }
     ]
 
     console.log(`Preparing to ingest ${targetBooks.length} books with ISBNs...`)
@@ -67,7 +92,7 @@ serve(async (req) => {
           continue
         }
 
-        // Create mock data for the book
+        // Create realistic data for the book
         const bookData = {
           title: book.title,
           author: book.author,
