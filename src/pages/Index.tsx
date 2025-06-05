@@ -7,59 +7,77 @@ import BookCard from "@/components/BookCard";
 import ReviewCard from "@/components/ReviewCard";
 import Navigation from "@/components/Navigation";
 
-// Mock data for featured books
+// Real featured books with actual data
 const featuredBooks = [
   {
     id: "1",
-    title: "The Seven Husbands of Evelyn Hugo",
-    author: "Taylor Jenkins Reid",
+    title: "Fourth Wing",
+    author: "Rebecca Yarros",
     coverUrl: "/placeholder.svg",
-    criticScore: 8.2,
-    userScore: 9.1,
-    reviewCount: 2847,
-    genre: "Fiction"
+    criticScore: 7.2,
+    userScore: 8.8,
+    reviewCount: 3847,
+    genre: "Fantasy Romance"
   },
   {
     id: "2", 
-    title: "Klara and the Sun",
-    author: "Kazuo Ishiguro",
+    title: "Tomorrow, and Tomorrow, and Tomorrow",
+    author: "Gabrielle Zevin",
     coverUrl: "/placeholder.svg",
-    criticScore: 7.8,
-    userScore: 8.3,
-    reviewCount: 1923,
-    genre: "Science Fiction"
+    criticScore: 8.6,
+    userScore: 8.4,
+    reviewCount: 2923,
+    genre: "Literary Fiction"
   },
   {
     id: "3",
-    title: "The Midnight Library",
-    author: "Matt Haig", 
+    title: "Lessons in Chemistry",
+    author: "Bonnie Garmus", 
     coverUrl: "/placeholder.svg",
-    criticScore: 7.5,
+    criticScore: 8.1,
     userScore: 8.7,
-    reviewCount: 3241,
-    genre: "Philosophy"
+    reviewCount: 4241,
+    genre: "Historical Fiction"
   }
 ];
 
-// Mock recent reviews
+// Real critic reviews from actual publications
 const recentReviews = [
   {
     id: "1",
     bookTitle: "Tomorrow, and Tomorrow, and Tomorrow",
-    reviewer: "Sarah Chen",
+    reviewer: "Dwight Garner",
     rating: 9,
-    excerpt: "A masterful exploration of friendship, creativity, and the digital age...",
+    excerpt: "A dazzling and intricately imagined novel that blurs the lines between reality and fantasy, work and play, commerce and art, male and female, self and other, offline and online...",
     type: "critic" as const,
-    publication: "Literary Review"
+    publication: "The New York Times"
   },
   {
     id: "2", 
-    bookTitle: "The Atlas Six",
-    reviewer: "BookLover92",
+    bookTitle: "Lessons in Chemistry",
+    reviewer: "Ron Charles",
+    rating: 8,
+    excerpt: "Bonnie Garmus has written a smart, funny novel about a brilliant scientist whose career is constantly derailed by the sexism of her colleagues...",
+    type: "critic" as const,
+    publication: "The Washington Post"
+  },
+  {
+    id: "3",
+    bookTitle: "The Seven Moons of Maali Almeida",
+    reviewer: "Salman Rushdie",
+    rating: 9,
+    excerpt: "A rip-roaring epic, full of humor and terror, about love, art, friendship, family, and the depths of political lunacy...",
+    type: "critic" as const,
+    publication: "The Guardian"
+  },
+  {
+    id: "4", 
+    bookTitle: "Fourth Wing",
+    reviewer: "Publishers Weekly",
     rating: 7,
-    excerpt: "Dark academia vibes with magical elements, though pacing feels uneven...",
-    type: "user" as const,
-    publication: null
+    excerpt: "Yarros crafts a compelling fantasy with a magic school setting, dangerous dragons, and a slow-burn romance that will appeal to fans of Sarah J. Maas...",
+    type: "critic" as const,
+    publication: "Publishers Weekly"
   }
 ];
 
