@@ -1,4 +1,3 @@
-
 import { Star, Award, Users, BookOpen, Calendar, Share2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -189,7 +188,7 @@ const BookDetail = () => {
               </div>
             </div>
             
-            {/* Reader Reviews Placeholder */}
+            {/* Reader Reviews Section */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 font-serif">Reader Reviews</h2>
               <div className="text-center py-8 bg-gray-50 rounded-lg">
