@@ -42,14 +42,14 @@ const BookCard = ({ book }: BookCardProps) => {
   const primaryGenre = book.genre?.[0] || 'Fiction';
   const year = formatYear(book.published_date);
 
-  // Enhanced cover image URL generation with verified ISBN sources
+  // Enhanced cover image URL generation with multiple fallbacks
   const getCoverImageUrl = () => {
     // First try the stored cover_url
     if (book.cover_url && book.cover_url.trim()) {
       return book.cover_url;
     }
     
-    // Then try ISBN-based sources
+    // Then try ISBN-based sources with clean ISBN
     if (book.isbn && book.isbn.trim()) {
       const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
       // Use Open Library as primary source
@@ -62,6 +62,27 @@ const BookCard = ({ book }: BookCardProps) => {
 
   const coverImageUrl = getCoverImageUrl();
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    
+    // First fallback: try Google Books if coming from Open Library
+    if (target.src.includes('openlibrary') && book.isbn) {
+      const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
+      target.src = `https://books.google.com/books/content?id=${cleanIsbn}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
+      return;
+    } 
+    
+    // Second fallback: try alternative Open Library format if coming from Google
+    if (target.src.includes('google') && book.isbn) {
+      const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
+      target.src = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-M.jpg`;
+      return;
+    }
+    
+    // Final fallback: thematic book image
+    target.src = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
+  };
+
   return (
     <Link to={`/book/${book.id}`} className="block">
       <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-300 group cursor-pointer">
@@ -70,23 +91,7 @@ const BookCard = ({ book }: BookCardProps) => {
             src={coverImageUrl}
             alt={`Cover of ${book.title}`}
             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              const target = e.currentTarget;
-              // First fallback: try Google Books
-              if (target.src.includes('openlibrary') && book.isbn) {
-                const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
-                target.src = `https://books.google.com/books/content?id=${cleanIsbn}&printsec=frontcover&img=1&zoom=1`;
-              } 
-              // Second fallback: try alternative Open Library format
-              else if (target.src.includes('google') && book.isbn) {
-                const cleanIsbn = book.isbn.replace(/[-\s]/g, '');
-                target.src = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-M.jpg`;
-              }
-              // Final fallback: thematic book image
-              else {
-                target.src = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop&crop=center";
-              }
-            }}
+            onError={handleImageError}
             loading="lazy"
           />
           <div className="absolute top-3 right-3">
@@ -94,10 +99,10 @@ const BookCard = ({ book }: BookCardProps) => {
               {primaryGenre}
             </span>
           </div>
-          {year === 2025 && (
+          {year && year >= 2020 && (
             <div className="absolute top-3 left-3">
-              <span className="bg-green-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-md">
-                2025
+              <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-md">
+                {year}
               </span>
             </div>
           )}
@@ -114,9 +119,9 @@ const BookCard = ({ book }: BookCardProps) => {
             </p>
           )}
           
-          {/* Summary */}
+          {/* Enhanced summary display */}
           {book.summary && (
-            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+            <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
               {book.summary}
             </p>
           )}
@@ -137,7 +142,11 @@ const BookCard = ({ book }: BookCardProps) => {
                 </>
               ) : (
                 <span className="text-sm text-gray-500 italic">
-                  {reviewCount > 0 ? `${reviewCount} critic review${reviewCount !== 1 ? 's' : ''} • Score available with 5+ reviews` : 'Critic reviews loading...'}
+                  {reviewCount > 0 && reviewCount < 5 ? 
+                    `${reviewCount} review${reviewCount !== 1 ? 's' : ''} • Score available with 5+ reviews` : 
+                    reviewCount >= 5 ? 'Score calculating...' :
+                    'Reviews loading...'
+                  }
                 </span>
               )}
             </div>
@@ -145,7 +154,7 @@ const BookCard = ({ book }: BookCardProps) => {
 
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-500">
-              {book.isbn ? `ISBN: ${book.isbn}` : 'ISBN pending'}
+              {book.isbn ? `ISBN: ${book.isbn.slice(0, 13)}${book.isbn.length > 13 ? '...' : ''}` : 'Classic literature'}
             </span>
             <span className="text-slate-600 font-medium hover:text-slate-800 cursor-pointer">
               Read More →
