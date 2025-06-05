@@ -1,9 +1,16 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import BrowseBooks from "./pages/BrowseBooks";
+import BookDetail from "./pages/BookDetail";
+import ScoreExplained from "./pages/ScoreExplained";
+import WriteReview from "./pages/WriteReview";
+import Community from "./pages/Community";
+import Critics from "./pages/Critics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -16,6 +23,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/browse" element={<BrowseBooks />} />
+          <Route path="/book/:id" element={<BookDetail />} />
+          <Route path="/how-scores-work" element={<ScoreExplained />} />
+          <Route path="/write-review" element={<WriteReview />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/critics" element={<Critics />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

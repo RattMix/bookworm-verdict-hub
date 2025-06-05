@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Book, Menu, X, Star, Users, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,7 +12,7 @@ const Navigation = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-18">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3">
             <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-3 rounded-2xl shadow-lg transform hover:scale-110 transition-transform">
               <Book className="h-7 w-7 text-white" />
             </div>
@@ -23,22 +24,30 @@ const Navigation = () => {
                 📚 Where stories take unexpected turns ✨
               </span>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-2 font-medium px-4 py-2 rounded-full hover:bg-purple-50">
+            <Link to="/browse" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-2 font-medium px-4 py-2 rounded-full hover:bg-purple-50">
               <Star className="h-4 w-4" />
               Browse Books 📚
-            </a>
-            <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-2 font-medium px-4 py-2 rounded-full hover:bg-purple-50">
+            </Link>
+            <Link to="/critics" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-2 font-medium px-4 py-2 rounded-full hover:bg-purple-50">
               <Award className="h-4 w-4" />
               Critics Corner 🎯
-            </a>
-            <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-2 font-medium px-4 py-2 rounded-full hover:bg-purple-50">
+            </Link>
+            <Link to="/community" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-2 font-medium px-4 py-2 rounded-full hover:bg-purple-50">
               <Users className="h-4 w-4" />
               Community 💬
-            </a>
+            </Link>
+            <Link to="/write-review">
+              <Button variant="outline" className="text-purple-600 border-purple-600 hover:bg-purple-50 rounded-full px-6 py-2 font-semibold">
+                Write Review ✍️
+              </Button>
+            </Link>
+            <Link to="/how-scores-work" className="text-gray-700 hover:text-purple-600 transition-colors font-medium px-4 py-2 rounded-full hover:bg-purple-50">
+              How Scores Work
+            </Link>
             <Button variant="outline" className="text-purple-600 border-purple-600 hover:bg-purple-50 rounded-full px-6 py-2 font-semibold">
               Sign In 👋
             </Button>
@@ -64,18 +73,24 @@ const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden py-6 border-t-2 border-purple-100">
             <div className="flex flex-col space-y-4">
-              <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-50 font-medium">
+              <Link to="/browse" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-50 font-medium">
                 <Star className="h-5 w-5" />
                 Browse Books 📚
-              </a>
-              <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-50 font-medium">
+              </Link>
+              <Link to="/critics" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-50 font-medium">
                 <Award className="h-5 w-5" />
                 Critics Corner 🎯
-              </a>
-              <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-50 font-medium">
+              </Link>
+              <Link to="/community" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-50 font-medium">
                 <Users className="h-5 w-5" />
                 Community 💬
-              </a>
+              </Link>
+              <Link to="/write-review" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-50 font-medium">
+                Write Review ✍️
+              </Link>
+              <Link to="/how-scores-work" className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-50 font-medium">
+                How Scores Work 📊
+              </Link>
               <div className="flex flex-col space-y-3 pt-4 border-t border-purple-100">
                 <Button variant="outline" className="text-purple-600 border-purple-600 hover:bg-purple-50 w-full rounded-full py-3 font-semibold">
                   Sign In 👋
