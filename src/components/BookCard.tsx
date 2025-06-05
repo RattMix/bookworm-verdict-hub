@@ -8,7 +8,6 @@ interface Book {
   author: string;
   coverUrl: string;
   criticScore: number;
-  userScore: number;
   reviewCount: number;
   genre: string;
   year?: number;
@@ -16,7 +15,7 @@ interface Book {
 }
 
 interface BookCardProps {
-  book: Book;
+  book: BookCardProps;
 }
 
 const BookCard = ({ book }: BookCardProps) => {
@@ -55,26 +54,15 @@ const BookCard = ({ book }: BookCardProps) => {
           )}
           
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              {/* Critic Score */}
-              <div className="flex items-center space-x-2">
-                <div className="bg-blue-100 p-1.5 rounded-full">
-                  <Award className="h-4 w-4 text-blue-600" />
-                </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getScoreColor(book.criticScore)}`}>
-                  {book.criticScore}
-                </span>
+            <div className="flex items-center space-x-2">
+              {/* Critic Score Only */}
+              <div className="bg-blue-100 p-1.5 rounded-full">
+                <Award className="h-4 w-4 text-blue-600" />
               </div>
-              
-              {/* User Score */}
-              <div className="flex items-center space-x-2">
-                <div className="bg-green-100 p-1.5 rounded-full">
-                  <Users className="h-4 w-4 text-green-600" />
-                </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getScoreColor(book.userScore * 10)}`}>
-                  {book.userScore}
-                </span>
-              </div>
+              <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getScoreColor(book.criticScore)}`}>
+                {book.criticScore}
+              </span>
+              <span className="text-sm text-gray-600">Critic Score</span>
             </div>
           </div>
 

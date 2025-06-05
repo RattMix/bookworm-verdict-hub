@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Star, TrendingUp, Book, Users, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import BookCard from "@/components/BookCard";
 import ReviewCard from "@/components/ReviewCard";
 import Navigation from "@/components/Navigation";
 
-// Expanded featured books with real titles
+// Expanded featured books with real titles - removed fake userScore
 const featuredBooks = [
   {
     id: "1",
@@ -15,7 +14,6 @@ const featuredBooks = [
     author: "Shehan Karunatilaka",
     coverUrl: "https://covers.openlibrary.org/b/isbn/9781635574968-L.jpg",
     criticScore: 89,
-    userScore: 8.4,
     reviewCount: 1847,
     genre: "Literary Fiction",
     year: 2022,
@@ -27,7 +25,6 @@ const featuredBooks = [
     author: "Gabrielle Zevin",
     coverUrl: "https://covers.openlibrary.org/b/isbn/9780593321201-L.jpg",
     criticScore: 86,
-    userScore: 8.7,
     reviewCount: 2923,
     genre: "Literary Fiction",
     year: 2022,
@@ -39,7 +36,6 @@ const featuredBooks = [
     author: "Jessamine Chan",
     coverUrl: "https://covers.openlibrary.org/b/isbn/9781501177736-L.jpg",
     criticScore: 78,
-    userScore: 7.9,
     reviewCount: 1623,
     genre: "Dystopian Fiction",
     year: 2022,
@@ -51,7 +47,6 @@ const featuredBooks = [
     author: "R.F. Kuang",
     coverUrl: "https://covers.openlibrary.org/b/isbn/9780063021426-L.jpg",
     criticScore: 81,
-    userScore: 8.9,
     reviewCount: 3241,
     genre: "Fantasy",
     year: 2022,
@@ -63,7 +58,6 @@ const featuredBooks = [
     author: "Olivie Blake",
     coverUrl: "https://covers.openlibrary.org/b/isbn/9781250854445-L.jpg",
     criticScore: 72,
-    userScore: 8.1,
     reviewCount: 2156,
     genre: "Fantasy",
     year: 2022,

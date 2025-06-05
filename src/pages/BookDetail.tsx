@@ -15,8 +15,6 @@ const bookData = {
   plotSummary: "On a bitter-cold day, in the December of his junior year at Harvard, Sam Masur exits a subway car and sees, amid the hordes of people waiting on the platform, Sadie Green. He calls her name. A decade-plus worth of history falls between them.",
   criticScore: 86,
   criticReviewCount: 34,
-  readerScore: 8.4,
-  readerReviewCount: 2923,
   criticConsensus: "Zevin crafts a sophisticated meditation on creativity, friendship, and digital culture that manages to be both intellectually ambitious and emotionally resonant."
 };
 
