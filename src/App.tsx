@@ -11,6 +11,10 @@ import HowItWorks from "./pages/HowItWorks";
 import WriteReview from "./pages/WriteReview";
 import Community from "./pages/Community";
 import Critics from "./pages/Critics";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfUse from "./pages/TermsOfUse";
+import CookiePreferences from "./pages/CookiePreferences";
+import ContentModerationPolicy from "./pages/ContentModerationPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +33,10 @@ const App = () => (
           <Route path="/write-review" element={<WriteReview />} />
           <Route path="/community" element={<Community />} />
           <Route path="/critics" element={<Critics />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfUse />} />
+          <Route path="/cookies" element={<CookiePreferences />} />
+          <Route path="/moderation" element={<ContentModerationPolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -240,10 +240,14 @@ const Index = () => {
                 </div>
                 <span className="text-2xl font-bold font-serif">Plot Twist</span>
               </div>
-              <p className="text-slate-300 leading-relaxed">
-                Plot Twist is an independent book review aggregator — combining critic reviews and reader opinions (coming soon). 
-                It's not linked to any platform or publisher.
-              </p>
+              <div className="mb-6">
+                <p className="text-slate-200 font-medium mb-2">
+                  Plot Twist is an independent book review aggregator.
+                </p>
+                <p className="text-slate-300 leading-relaxed">
+                  We combine critic reviews and reader ratings (coming soon) — with no publisher affiliation, platform bias, or retail agenda.
+                </p>
+              </div>
             </div>
             
             <div>
@@ -258,8 +262,10 @@ const Index = () => {
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-slate-300">
-                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Use</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms</a></li>
+                <li><a href="/cookies" className="hover:text-white transition-colors">Cookies</a></li>
+                <li><a href="/moderation" className="hover:text-white transition-colors">Moderation</a></li>
               </ul>
             </div>
           </div>
