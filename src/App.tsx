@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import BrowseBooks from "./pages/BrowseBooks";
 import BookDetail from "./pages/BookDetail";
-import ScoreExplained from "./pages/ScoreExplained";
+import HowItWorks from "./pages/HowItWorks";
 import WriteReview from "./pages/WriteReview";
 import Community from "./pages/Community";
 import Critics from "./pages/Critics";
@@ -25,7 +25,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/browse" element={<BrowseBooks />} />
           <Route path="/book/:id" element={<BookDetail />} />
-          <Route path="/how-scores-work" element={<ScoreExplained />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/write-review" element={<WriteReview />} />
           <Route path="/community" element={<Community />} />
           <Route path="/critics" element={<Critics />} />

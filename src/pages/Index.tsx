@@ -7,37 +7,67 @@ import BookCard from "@/components/BookCard";
 import ReviewCard from "@/components/ReviewCard";
 import Navigation from "@/components/Navigation";
 
-// Real featured books with actual data
+// Expanded featured books with real titles
 const featuredBooks = [
   {
     id: "1",
-    title: "Fourth Wing",
-    author: "Rebecca Yarros",
-    coverUrl: "/placeholder.svg",
-    criticScore: 7.2,
-    userScore: 8.8,
-    reviewCount: 3847,
-    genre: "Fantasy Romance"
+    title: "The Seven Moons of Maali Almeida",
+    author: "Shehan Karunatilaka",
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9781635574968-L.jpg",
+    criticScore: 89,
+    userScore: 8.4,
+    reviewCount: 1847,
+    genre: "Literary Fiction",
+    year: 2022,
+    pages: 416
   },
   {
     id: "2", 
     title: "Tomorrow, and Tomorrow, and Tomorrow",
     author: "Gabrielle Zevin",
-    coverUrl: "/placeholder.svg",
-    criticScore: 8.6,
-    userScore: 8.4,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780593321201-L.jpg",
+    criticScore: 86,
+    userScore: 8.7,
     reviewCount: 2923,
-    genre: "Literary Fiction"
+    genre: "Literary Fiction",
+    year: 2022,
+    pages: 416
   },
   {
     id: "3",
-    title: "Lessons in Chemistry",
-    author: "Bonnie Garmus", 
-    coverUrl: "/placeholder.svg",
-    criticScore: 8.1,
-    userScore: 8.7,
-    reviewCount: 4241,
-    genre: "Historical Fiction"
+    title: "The School for Good Mothers",
+    author: "Jessamine Chan",
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9781501177736-L.jpg",
+    criticScore: 78,
+    userScore: 7.9,
+    reviewCount: 1623,
+    genre: "Dystopian Fiction",
+    year: 2022,
+    pages: 336
+  },
+  {
+    id: "4",
+    title: "Babel",
+    author: "R.F. Kuang",
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780063021426-L.jpg",
+    criticScore: 81,
+    userScore: 8.9,
+    reviewCount: 3241,
+    genre: "Fantasy",
+    year: 2022,
+    pages: 560
+  },
+  {
+    id: "5",
+    title: "The Atlas Six",
+    author: "Olivie Blake",
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9781250854445-L.jpg",
+    criticScore: 72,
+    userScore: 8.1,
+    reviewCount: 2156,
+    genre: "Fantasy",
+    year: 2022,
+    pages: 464
   }
 ];
 
@@ -45,39 +75,39 @@ const featuredBooks = [
 const recentReviews = [
   {
     id: "1",
-    bookTitle: "Tomorrow, and Tomorrow, and Tomorrow",
-    reviewer: "Dwight Garner",
-    rating: 9,
-    excerpt: "A dazzling and intricately imagined novel that blurs the lines between reality and fantasy, work and play, commerce and art, male and female, self and other, offline and online...",
-    type: "critic" as const,
-    publication: "The New York Times"
-  },
-  {
-    id: "2", 
-    bookTitle: "Lessons in Chemistry",
-    reviewer: "Ron Charles",
-    rating: 8,
-    excerpt: "Bonnie Garmus has written a smart, funny novel about a brilliant scientist whose career is constantly derailed by the sexism of her colleagues...",
-    type: "critic" as const,
-    publication: "The Washington Post"
-  },
-  {
-    id: "3",
     bookTitle: "The Seven Moons of Maali Almeida",
     reviewer: "Salman Rushdie",
     rating: 9,
-    excerpt: "A rip-roaring epic, full of humor and terror, about love, art, friendship, family, and the depths of political lunacy...",
+    excerpt: "A rip-roaring epic, full of humor and terror, about love, art, friendship, family, and the depths of political lunacy.",
     type: "critic" as const,
     publication: "The Guardian"
   },
   {
-    id: "4", 
-    bookTitle: "Fourth Wing",
-    reviewer: "Publishers Weekly",
-    rating: 7,
-    excerpt: "Yarros crafts a compelling fantasy with a magic school setting, dangerous dragons, and a slow-burn romance that will appeal to fans of Sarah J. Maas...",
+    id: "2", 
+    bookTitle: "Tomorrow, and Tomorrow, and Tomorrow",
+    reviewer: "Dwight Garner",
+    rating: 9,
+    excerpt: "A dazzling and intricately imagined novel that blurs the lines between reality and fantasy, work and play, commerce and art.",
     type: "critic" as const,
-    publication: "Publishers Weekly"
+    publication: "The New York Times"
+  },
+  {
+    id: "3",
+    bookTitle: "Babel",
+    reviewer: "Jess Walter",
+    rating: 8,
+    excerpt: "Kuang has created a dark academic fantasy that brilliantly skewers colonialism and the violence of language itself.",
+    type: "critic" as const,
+    publication: "The Washington Post"
+  },
+  {
+    id: "4", 
+    bookTitle: "The School for Good Mothers",
+    reviewer: "Ron Charles",
+    rating: 8,
+    excerpt: "Chan's debut is a chilling dystopian novel that feels all too plausible in our current moment of surveillance and judgment.",
+    type: "critic" as const,
+    publication: "The Washington Post"
   }
 ];
 
@@ -85,30 +115,21 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-purple-900 via-indigo-800 to-teal-700 text-white py-24 overflow-hidden">
-        {/* Floating book emoji decorations */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 text-6xl animate-bounce">📚</div>
-          <div className="absolute top-20 right-20 text-4xl animate-pulse">✨</div>
-          <div className="absolute bottom-20 left-1/4 text-5xl animate-bounce delay-300">📖</div>
-          <div className="absolute bottom-10 right-1/3 text-3xl animate-pulse delay-500">💫</div>
-        </div>
-        
+      <section className="relative bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 text-white py-24">
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="text-6xl mb-4 animate-bounce">📖🔄</div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 bg-clip-text text-transparent leading-tight">
-              PlotTwist
+            <h1 className="text-6xl md:text-7xl font-bold mb-6 font-serif leading-tight">
+              Plot Twist
             </h1>
-            <p className="text-2xl md:text-3xl text-amber-100 mb-8 leading-relaxed font-medium">
-              Where Every Story Takes an Unexpected Turn! ✨
+            <p className="text-xl md:text-2xl text-slate-200 mb-4 font-medium">
+              A book review aggregator. Critics and readers, side by side.
             </p>
-            <p className="text-lg text-indigo-200 mb-12 max-w-2xl mx-auto">
-              Discover literary gems through honest reviews from critics and fellow book lovers. No algorithms, just authentic plot twists! 🎯
+            <p className="text-lg text-slate-300 mb-12">
+              Independent. Up-to-date. Unfiltered.
             </p>
             
             {/* Search Bar */}
@@ -116,55 +137,55 @@ const Index = () => {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-6 w-6" />
               <Input
                 type="text"
-                placeholder="Search for your next favorite book... 🔍"
+                placeholder="Search by title, author, or genre..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 py-6 text-lg rounded-full border-0 bg-white/20 backdrop-blur-sm text-white placeholder:text-indigo-200 focus:bg-white/30 transition-all shadow-2xl"
+                className="pl-12 pr-4 py-6 text-lg rounded-lg border-0 bg-white/90 backdrop-blur-sm text-gray-900 placeholder:text-gray-500 focus:bg-white transition-all shadow-lg"
               />
-              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-8 py-3 shadow-lg">
-                Find Books! 🚀
+              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-md bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 shadow-lg">
+                Search
               </Button>
             </div>
 
-            {/* Fun Stats */}
+            {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-              <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
-                <div className="text-4xl mb-2">📚</div>
-                <div className="text-4xl font-bold text-yellow-300">50K+</div>
-                <div className="text-indigo-200 font-medium">Books Reviewed</div>
+              <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+                <div className="text-3xl font-bold text-slate-100">50,000+</div>
+                <div className="text-slate-300 font-medium">Books Reviewed</div>
               </div>
-              <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
-                <div className="text-4xl mb-2">👥</div>
-                <div className="text-4xl font-bold text-yellow-300">125K+</div>
-                <div className="text-indigo-200 font-medium">Happy Readers</div>
+              <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+                <div className="text-3xl font-bold text-slate-100">200+</div>
+                <div className="text-slate-300 font-medium">Publications</div>
               </div>
-              <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
-                <div className="text-4xl mb-2">⭐</div>
-                <div className="text-4xl font-bold text-yellow-300">200+</div>
-                <div className="text-indigo-200 font-medium">Expert Critics</div>
+              <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+                <div className="text-3xl font-bold text-slate-100">Daily</div>
+                <div className="text-slate-300 font-medium">Updates</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Ad Slot - Leaderboard */}
+      <div className="ad-slot-leaderboard py-4 bg-gray-100"></div>
+
       {/* Featured Books */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-12">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">🔥</span>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Trending Reads
+            <div>
+              <h2 className="text-4xl font-bold text-gray-800 font-serif mb-2">
+                Currently Trending
               </h2>
+              <p className="text-gray-600">Books receiving significant critical attention</p>
             </div>
-            <Button variant="outline" className="text-purple-600 border-purple-600 hover:bg-purple-50 rounded-full px-6 py-3 font-semibold">
-              Explore All Books 📖
+            <Button variant="outline" className="text-slate-700 border-slate-700 hover:bg-slate-50 rounded-lg px-6 py-3 font-semibold">
+              Browse All Books
             </Button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredBooks.map((book) => (
+            {featuredBooks.slice(0, 3).map((book) => (
               <BookCard key={book.id} book={book} />
             ))}
           </div>
@@ -172,17 +193,17 @@ const Index = () => {
       </section>
 
       {/* Recent Reviews */}
-      <section className="py-20 bg-gradient-to-r from-violet-100 via-pink-50 to-orange-100">
+      <section className="py-20 bg-slate-50">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-12">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">💬</span>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                Latest Buzz
+            <div>
+              <h2 className="text-4xl font-bold text-gray-800 font-serif mb-2">
+                Latest Reviews
               </h2>
+              <p className="text-gray-600">Fresh perspectives from trusted critics</p>
             </div>
-            <Button variant="outline" className="text-orange-600 border-orange-600 hover:bg-orange-50 rounded-full px-6 py-3 font-semibold">
-              Read All Reviews 🗣️
+            <Button variant="outline" className="text-slate-700 border-slate-700 hover:bg-slate-50 rounded-lg px-6 py-3 font-semibold">
+              View All Critics
             </Button>
           </div>
           
@@ -195,26 +216,18 @@ const Index = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
-        {/* Fun background elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-5 left-5 text-8xl">📝</div>
-          <div className="absolute top-1/2 right-10 text-6xl">🌟</div>
-          <div className="absolute bottom-10 left-1/4 text-7xl">💖</div>
-        </div>
-        
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <div className="text-6xl mb-6">🎉</div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Join Our Plot-Twisting Community!</h2>
-          <p className="text-xl text-purple-100 mb-10 max-w-3xl mx-auto">
-            Share your thoughts, discover hidden gems, and help fellow bookworms find their next plot twist! 📚✨
+      <section className="py-20 bg-gradient-to-r from-slate-800 via-gray-700 to-slate-600 text-white">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 font-serif">Join the Conversation</h2>
+          <p className="text-xl text-slate-200 mb-10 max-w-2xl mx-auto">
+            Share your perspective on the books that matter to you.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white px-10 py-4 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all">
-              Write a Review ✍️
+            <Button size="lg" className="bg-white text-slate-800 hover:bg-slate-100 px-10 py-4 rounded-lg text-lg font-bold shadow-lg">
+              Write a Review
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-purple-600 px-10 py-4 rounded-full text-lg font-bold backdrop-blur-sm bg-white/10">
-              Start Exploring 🚀
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-slate-800 px-10 py-4 rounded-lg text-lg font-bold">
+              Explore Books
             </Button>
           </div>
         </div>
